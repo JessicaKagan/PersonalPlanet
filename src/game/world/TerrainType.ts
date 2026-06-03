@@ -13,6 +13,9 @@ export enum TerrainType {
     OCEAN,
     ICE_CAP,
 
+    /** Lakes, possibly rivers? */
+    FRESHWATER,
+
     /** Cold land terrains */
 
     POLAR, 
