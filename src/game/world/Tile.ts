@@ -27,6 +27,11 @@ export interface Tile {
     
     /**
      * The visual representation of this tile (Phaser game object)
+     * FUTURE: The image for a tile is separate from the TerrainType.
+     * Amongst other things, this potentially means we can have multiple
+     * variants for terrain tiles. However, having these decoupled can also
+     * introduce bugs where the graphics don't match the internal representation
+     * of the tile. We should investigate this.
      */
     gameObject?: Phaser.GameObjects.Image;
 

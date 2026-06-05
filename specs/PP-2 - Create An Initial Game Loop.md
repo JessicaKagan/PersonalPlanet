@@ -1,3 +1,13 @@
-TODO: This is a ticket for hooking up some sort of initial (dummy) simulation logic. Perhaps, as a placeholder, something to change **Tiles** into different ones every now and then?
+The goal of this ticket is to create a minimal game scene for Personal Planet (overwriting the placeholder content in `src\game\scenes\Game.ts`). We need to do the following:
 
-* This ticket depends on PP-1 being complete, but isn't necessarily the next one in line.
+* When we enter the "game" scene, generate a new **World** object. This will be empty when it's first initialized; in order to ease testing, we'll want to fill it up with non-empty tiles.
+    * In the very short term, we'll probably want to pass in a very small **World** width and height, such as a 10x10 grid.
+    * We'll keep the constructor and the routines for generating **Tiles** for a **World** separate, since the latter will be expanded in later tickets.
+* Next, we'll add routines to render the **World**. This means drawing at least a subset of the **World**'s grid of **Tiles**. There's a few unknowns here.
+    * First - while we don't need it for the very first iteration, how do we make sure we're only rendering **Tiles** that are visible in the user's scene? We eventually need a way to determine which **Tiles** are displayed by Phaser's camera, so that we're not trying to draw the entire map constantly.
+    * Second - how often do we want to draw tiles? My hypothesis is that Phaser handles low level screen-redrawing routines. If so, we may be able to simply rerender specific tiles when their contents change.
+* Finally, we need to implement a simulation loop. We'll create a loop that runs consistently during the Game scene and requests updates to each layer of simulation we create as appropriate.
+    * A key concept here is that we don't need to update the entire simulation state on each tick. Different layers should be able to update at varying frequencies depending on their priority, which will depend on how computationally intensive they are, how much they're intended to affect gameplay, etc.
+    * Users won't necessarily want to constantly run the simulation at the maximum speed their computer can handle. Therefore, we also need the ability to run the simulation at a specific speed. X ticks per second. When the simulation is running at a lower speed, this means we should wait a predetermined amount of time between computing each tick.
+
+For now, we'll want a debugging function to run during the loops to test how these components interact. For example, we could update the contents of **Tiles** at regular intervals, in order to make sure that data persists properly, and that changes to the **World** are visible in rendering. 
