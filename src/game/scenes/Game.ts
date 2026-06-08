@@ -3,12 +3,17 @@ import { Scene } from 'phaser';
 import { World } from '../world/World';
 import { TerrainType } from '../world/TerrainType';
 
+const DEFAULT_SIMULATION_TICKS_PER_SECOND = 50;
+
 export class Game extends Scene
 {
     camera: Phaser.Cameras.Scene2D.Camera;
     world: World;
     tileMap: Phaser.GameObjects.TileSprite[] = [];
 
+    public updateInterval = 1000 / DEFAULT_SIMULATION_TICKS_PER_SECOND; // Update the simulation every 100ms by default.
+    public timeSinceLastUpdate = 0; // Keep track of how much time has passed since the last interval.
+    
     constructor ()
     {
         super('Game');
@@ -25,7 +30,7 @@ export class Game extends Scene
         // Fill the world with some test tiles
         this.populateWorld();
         
-        // Render the world
+        // Render the initial state of the world
         this.renderWorld();
 
         EventBus.emit('current-scene-ready', this);
@@ -85,9 +90,11 @@ export class Game extends Scene
                 const tile = tiles[x][y];
                 if (tile) {
                     // Create a visual representation of the tile
-                    const tileSprite = this.add.image(
+                    const tileSprite = this.add.tileSprite(
                         x * tileSize,
                         y * tileSize,
+                        tileSize,
+                        tileSize,
                         this.getTileTextureKey(tile.terrainType)
                     );
                     
@@ -139,7 +146,63 @@ export class Game extends Scene
                 return 'ocean'; // Default fallback
         }
     }
+    
+    update (time: number, delta: number)
+    {
+        // Every time Phaser produces a new frame, check if the simulation needs an update.
+        // FUTURE: We most likely want this to work the other way around - i.e, the simulation itself should update consistently (as possible),
+        // and the renderer should pick up any changes to the in-game world that have happened since the last frame.
+        this.timeSinceLastUpdate += delta;
+        if (this.timeSinceLastUpdate >= this.updateInterval) {
+            this.updateSimulation();
 
+            this.timeSinceLastUpdate = 0;
+        }
+    }
+
+    updateSimulation()
+    {
+        // This is where we would update simulation layers at different frequencies
+        // For now, let's just do a simple debug update to test that components work together
+        
+        // Update some tiles randomly for testing
+        if (Math.random() > 0.7) { // 30% chance to change a tile each tick
+            const x = Math.floor(Math.random() * this.world.getWidth());
+            const y = Math.floor(Math.random() * this.world.getHeight());
+            
+            const tile = this.world.getTile(x, y);
+            if (tile && tile.terrainType !== TerrainType.EMPTY) {
+                // Change to a different terrain type for testing
+                const terrainTypes = [
+                    TerrainType.OCEAN,
+                    TerrainType.FRESHWATER,
+                    TerrainType.GRASSLAND,
+                    TerrainType.TUNDRA,
+                    TerrainType.TAIGA,
+                    TerrainType.HOT_DESERT
+                ];
+                tile.terrainType = terrainTypes[Math.floor(Math.random() * terrainTypes.length)];
+                
+                // Update the visual representation
+                this.updateTileVisual(x, y);
+            }
+        }
+    }
+
+    updateTileVisual(x: number, y: number)
+    {
+        // Find and update the corresponding sprite
+        const tile = this.world.getTile(x, y);
+        if (tile) {
+            const tileSize = 64;
+            const index = y * this.world.getWidth() + x;
+            
+            if (this.tileMap[index]) {
+                // Update the texture of the sprite
+                this.tileMap[index].setTexture(this.getTileTextureKey(tile.terrainType));
+            }
+        }
+    }
 
     changeScene ()
     {
