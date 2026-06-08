@@ -107,4 +107,48 @@ export class World {
             }
         }
     }
+
+    /**
+     * Fill a World object with tiles. Currently, this simply generates a variety of random tiles for testing.
+     * FUTURE: Add an argument for which mode we'll use to populate the world. The current one will be a "generate new world" method.
+     * We'll also want to add a "load from save" method.
+     */
+    populateWorld()
+    {
+        for (let x = 0; x < this.getWidth(); x++) {
+            for (let y = 0; y < this.getHeight(); y++) {
+
+                // Create a simple pattern of terrain types
+                let terrainType: TerrainType;
+                
+                if (x < 3 && y < 3) {
+                    terrainType = TerrainType.OCEAN;
+                } else if (x >= 7 && y >= 7) {
+                    terrainType = TerrainType.TUNDRA;
+                } else if (x > 3 && x < 7 && y > 3 && y < 7) {
+                    terrainType = TerrainType.GRASSLAND;
+                } else {
+                    // Random terrain for the rest
+                    const terrainTypes = [
+                        TerrainType.FRESHWATER,
+                        TerrainType.POLAR,
+                        TerrainType.TAIGA,
+                        TerrainType.COLD_DESERT,
+                        TerrainType.STEPPE,
+                        TerrainType.TEMPERATE_FOREST,
+                        TerrainType.TEMPERATE_SWAMP,
+                        TerrainType.HOT_DESERT,
+                        TerrainType.TROPICAL_GRASSLAND,
+                        TerrainType.TROPICAL_FOREST
+                    ];
+                    terrainType = terrainTypes[Math.floor(Math.random() * terrainTypes.length)];
+                }
+                
+                const tile = this.getTile(x, y);
+                if (tile) {
+                    tile.terrainType = terrainType;
+                }
+            }
+        }
+    }
 }

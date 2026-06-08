@@ -28,51 +28,12 @@ export class Game extends Scene
         this.world = new World(10, 10);
         
         // Fill the world with some test tiles
-        this.populateWorld();
+        this.world.populateWorld();
         
         // Render the initial state of the world
         this.renderWorld();
 
         EventBus.emit('current-scene-ready', this);
-    }
-
-    populateWorld()
-    {
-        // Fill the world with different terrain types for testing
-        for (let x = 0; x < this.world.getWidth(); x++) {
-            for (let y = 0; y < this.world.getHeight(); y++) {
-                // Create a simple pattern of terrain types
-                let terrainType: TerrainType;
-                
-                if (x < 3 && y < 3) {
-                    terrainType = TerrainType.OCEAN;
-                } else if (x >= 7 && y >= 7) {
-                    terrainType = TerrainType.TUNDRA;
-                } else if (x > 3 && x < 7 && y > 3 && y < 7) {
-                    terrainType = TerrainType.GRASSLAND;
-                } else {
-                    // Random terrain for the rest
-                    const terrainTypes = [
-                        TerrainType.FRESHWATER,
-                        TerrainType.POLAR,
-                        TerrainType.TAIGA,
-                        TerrainType.COLD_DESERT,
-                        TerrainType.STEPPE,
-                        TerrainType.TEMPERATE_FOREST,
-                        TerrainType.TEMPERATE_SWAMP,
-                        TerrainType.HOT_DESERT,
-                        TerrainType.TROPICAL_GRASSLAND,
-                        TerrainType.TROPICAL_FOREST
-                    ];
-                    terrainType = terrainTypes[Math.floor(Math.random() * terrainTypes.length)];
-                }
-                
-                const tile = this.world.getTile(x, y);
-                if (tile) {
-                    tile.terrainType = terrainType;
-                }
-            }
-        }
     }
 
     renderWorld()
