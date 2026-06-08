@@ -1,6 +1,6 @@
 The goal of this ticket is to create a minimal game scene for Personal Planet (overwriting the placeholder content in `src\game\scenes\Game.ts`). We need to do the following:
 
-* Add some initial tile graphics we can use for testing purposes. There's plenty of game graphics out there with permissive licenses we can use.
+* DONE: Add some initial tile graphics we can use for testing purposes. There's plenty of game graphics out there with permissive licenses we can use.
 * When we enter the "game" scene, generate a new **World** object. This will be empty when it's first initialized; in order to ease testing, we'll want to fill it up with non-empty tiles.
     * In the very short term, we'll probably want to pass in a very small **World** width and height, such as a 10x10 grid. In a future ticket, we'll add camera controls as a prerequisite for generating a larger grid. We eventually need a way to determine which **Tiles** are displayed by Phaser's camera, so that we're not trying to draw the entire map constantly.
     * We'll keep the constructor and the routines for generating **Tiles** for a **World** separate, since the latter will be expanded in later tickets.
