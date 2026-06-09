@@ -121,6 +121,7 @@ export class Game extends Scene
         }
     }
 
+    // TODO: Figure out if this and updateTileVisual should be moved to an "Update" file. Perhaps its own folder, too?
     updateSimulation()
     {
         // This is where we would update simulation layers at different frequencies
@@ -155,7 +156,6 @@ export class Game extends Scene
         // Find and update the corresponding sprite
         const tile = this.world.getTile(x, y);
         if (tile) {
-            const tileSize = 64;
             const index = y * this.world.getWidth() + x;
             
             if (this.tileMap[index]) {
