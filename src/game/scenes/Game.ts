@@ -1,9 +1,11 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
-import { World } from '../world/World';
 import { TerrainType } from '../world/TerrainType';
+import { World, DEFAULT_WORLD_SIZE } from '../world/World';
+import { DEFAULT_TILE_SIZE } from '../world/Tile';
 
 const DEFAULT_SIMULATION_TICKS_PER_SECOND = 50;
+
 const MINIMUM_ZOOM_FACTOR = 1;
 const MAXIMUM_ZOOM_FACTOR = 1 / 16;
 const DEFAULT_ZOOM_TICK = Math.sqrt(2); // Using a number that "cleanly" multiplies into 2 allows the user finer zooming, while keeping the values predictable.
@@ -35,15 +37,16 @@ export class Game extends Scene
 
     create ()
     {
-        this.camera = this.cameras.main;
-        this.camera.setBackgroundColor(0x000000);
-
-        // Create a new world with a small test grid (10x10)
-        this.world = new World(10, 10);
+        // FUTURE: We should eventually allow users to generate a world with a custom size.
+        this.world = new World(DEFAULT_WORLD_SIZE.x, DEFAULT_WORLD_SIZE.y);
         
         // Fill the world with some test tiles
         this.world.populateWorld();
         
+        this.camera = this.cameras.main;
+        this.camera.setBackgroundColor(0x000000);
+        this.camera.setBounds(0, 0, DEFAULT_WORLD_SIZE.x * DEFAULT_TILE_SIZE, DEFAULT_WORLD_SIZE.y * DEFAULT_TILE_SIZE);
+
         // Render the initial state of the world
         this.renderWorld();
 
@@ -64,22 +67,20 @@ export class Game extends Scene
         });
 
         this.input.addListener('pointerup', (pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]) => {
-            this.isPointerHeldDown = false;
+            this.isPointerHeldDown = false; 
             this.isMiddleMouseHeldDown = false;
         });
 
         this.input.addListener('pointermove', (pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]) => {
-            // For camera movement...
+            // Drag the camera based on the user's mouse movement.
             if (this.isMiddleMouseHeldDown) {
-                // ... drag the camera based on the user's mouse movement...
                 const delta = {
                     x: pointer.position.x - pointer.prevPosition.x,
                     y: pointer.position.y - pointer.prevPosition.y
                 };
 
+                // The camera bounds we set ensure that users can't scroll outside their worlds.
                 this.camera.setScroll(this.camera.scrollX - delta.x, this.camera.scrollY - delta.y);
-                // ... TODO: then clamp to valid positions in the world.
-                // console.log(this.camera.getBounds());
             }
         });
 

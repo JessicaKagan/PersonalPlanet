@@ -4,6 +4,8 @@
  */
 import { TerrainType } from './TerrainType';
 
+export const DEFAULT_TILE_SIZE = 64;
+
 export interface Tile {
     /**
      * Unique identifier for the tile

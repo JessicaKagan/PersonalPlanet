@@ -4,6 +4,8 @@
 import { TerrainType } from './TerrainType';
 import type { Tile } from './Tile';
 
+export const DEFAULT_WORLD_SIZE = { x: 64, y: 64 };
+
 export class World {
     /**
      * The width of the world in tiles
