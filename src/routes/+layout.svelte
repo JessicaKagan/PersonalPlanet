@@ -1,5 +1,5 @@
 <svelte:head>
-    <title>Phaser Svelte Template</title>
+    <title>Personal Planet 🌎</title>
 </svelte:head>
 
 <slot />
