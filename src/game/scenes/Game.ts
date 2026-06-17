@@ -77,7 +77,7 @@ export class Game extends Scene
 
         this.input.addListener('wheel', (pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]) => {
             // Adjust the zoom every time the mousewheel ticks.
-            // FUTURE: We should center the camera if users zoom out enough that their entire world is visible.
+            // FUTURE: We should center the camera if users zoom out enough that their entire world is visible. 
             if (pointer.deltaY >= 0) {
                 this.camera.zoom /= DEFAULT_ZOOM_TICK; // Zoom out when scrolling "down"
             } else {
@@ -118,7 +118,7 @@ export class Game extends Scene
                     
                     tileSprite.setPosition(x * tileSize, y * tileSize); // Set the sprite to be at the correct position in world space
                     tileSprite.setScale(1);
-                    tileSprite.setScale(1); // 100% zoom level
+                    tileSprite.setInteractive(); // Users should be able to click on tiles to interact with them.
                     
                     // Store reference for potential updates
                     this.tileMap.push(tileSprite);
