@@ -4,6 +4,9 @@ import { World } from '../world/World';
 import { TerrainType } from '../world/TerrainType';
 
 const DEFAULT_SIMULATION_TICKS_PER_SECOND = 50;
+const MINIMUM_ZOOM_FACTOR = 1;
+const MAXIMUM_ZOOM_FACTOR = 1 / 16;
+const DEFAULT_ZOOM_TICK = Math.sqrt(2); // Using a number that "cleanly" multiplies into 2 allows the user finer zooming, while keeping the values predictable.
 
 export class Game extends Scene
 {
@@ -81,7 +84,20 @@ export class Game extends Scene
         });
 
         this.input.addListener('wheel', (pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]) => {
-            // TODO: Mousewheel events should result in camera zoom, at least within a specific range.
+            // Adjust the zoom every time the mousewheel ticks.
+            if (pointer.deltaY >= 0) {
+                this.camera.zoom /= DEFAULT_ZOOM_TICK; // Zoom out when scrolling "down"
+            } else {
+                this.camera.zoom *= DEFAULT_ZOOM_TICK; // Zoom in when scrolling "up".
+            }
+
+            if (this.camera.zoom > MINIMUM_ZOOM_FACTOR) {
+                this.camera.zoom = MINIMUM_ZOOM_FACTOR;
+            }
+
+            if (this.camera.zoom < MAXIMUM_ZOOM_FACTOR) {
+                this.camera.zoom = MAXIMUM_ZOOM_FACTOR;
+            }
         });
     }
 
