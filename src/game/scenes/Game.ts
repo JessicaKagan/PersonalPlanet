@@ -66,8 +66,8 @@ export class Game extends Scene
             // Drag the camera based on the user's mouse movement.
             if (this.isMiddleMouseHeldDown) {
                 const delta = {
-                    x: pointer.position.x - pointer.prevPosition.x,
-                    y: pointer.position.y - pointer.prevPosition.y
+                    x: (pointer.position.x - pointer.prevPosition.x) / this.camera.zoom,
+                    y: (pointer.position.y - pointer.prevPosition.y) / this.camera.zoom
                 };
 
                 // The camera bounds we set ensure that users can't scroll outside their worlds.
@@ -77,7 +77,10 @@ export class Game extends Scene
 
         this.input.addListener('wheel', (pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]) => {
             // Adjust the zoom every time the mousewheel ticks.
-            // FUTURE: We should center the camera if users zoom out enough that their entire world is visible. 
+            // FUTURE: We should center the camera if users zoom out enough that their entire world is visible.
+            // FUTURE: We should zoom towards the user's cursor if doing so makes sense.
+            // I think this entails setting a scroll position based on averaging the position of the tile they're hovering over and the tile that's closest
+            // to the center of the screen.
             if (pointer.deltaY >= 0) {
                 this.camera.zoom /= DEFAULT_ZOOM_TICK; // Zoom out when scrolling "down"
             } else {
