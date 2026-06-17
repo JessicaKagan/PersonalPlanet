@@ -29,8 +29,7 @@ export class Game extends Scene
         super('Game');
     }
 
-    create ()
-    {
+    create (): void {
         // FUTURE: We should eventually allow users to generate a world with a custom size.
         this.world = new World(DEFAULT_WORLD_SIZE.x, DEFAULT_WORLD_SIZE.y);
         
@@ -42,7 +41,7 @@ export class Game extends Scene
         this.camera.setBounds(0, 0, DEFAULT_WORLD_SIZE.x * DEFAULT_TILE_SIZE, DEFAULT_WORLD_SIZE.y * DEFAULT_TILE_SIZE);
 
         // Render the initial state of the world
-        this.renderWorld();
+        this.renderInitialWorld();
 
         this.addControls();
 
@@ -78,6 +77,7 @@ export class Game extends Scene
 
         this.input.addListener('wheel', (pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]) => {
             // Adjust the zoom every time the mousewheel ticks.
+            // FUTURE: We should center the camera if users zoom out enough that their entire world is visible.
             if (pointer.deltaY >= 0) {
                 this.camera.zoom /= DEFAULT_ZOOM_TICK; // Zoom out when scrolling "down"
             } else {
@@ -94,8 +94,7 @@ export class Game extends Scene
         });
     }
 
-    renderWorld()
-    {
+    renderInitialWorld(): void {
         // Clear existing tiles
         this.tileMap.forEach(tile => tile.destroy());
         this.tileMap = [];
@@ -117,8 +116,8 @@ export class Game extends Scene
                         this.world.getTileTextureKey(tile.terrainType)
                     );
                     
-                    // Set the sprite to be at the correct position in world space
-                    tileSprite.setPosition(x * tileSize, y * tileSize);
+                    tileSprite.setPosition(x * tileSize, y * tileSize); // Set the sprite to be at the correct position in world space
+                    tileSprite.setScale(1);
                     tileSprite.setScale(1); // 100% zoom level
                     
                     // Store reference for potential updates
@@ -128,8 +127,7 @@ export class Game extends Scene
         }
     }
     
-    update (time: number, delta: number)
-    {
+    update (time: number, delta: number): void {
         // Every time Phaser produces a new frame, check if the simulation needs an update.
         // FUTURE: We most likely want this to work the other way around - i.e, the simulation itself should update consistently (as possible),
         // and the renderer should pick up any changes to the in-game world that have happened since the last frame.
