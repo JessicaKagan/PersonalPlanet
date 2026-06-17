@@ -19,14 +19,8 @@ export class Game extends Scene
     public updateInterval = 1000 / DEFAULT_SIMULATION_TICKS_PER_SECOND; // Update the simulation every 100ms by default.
     public timeSinceLastUpdate = 0; // Keep track of how much time has passed since the last interval.
     
-    /** Generic, top level mouse input handlers which are instantiated when we create the main game scene.
-     * FUTURE: Does Phaser tear down event handlers for its inputs when you leave a scene? If not, how do we handle this?
-     */
-    public onPointerDown?: Phaser.Input.InputPlugin; // Primarily for tracking click and drag events
-    public onPointerUp?: Phaser.Input.InputPlugin;
-    public onPointerMove?: Phaser.Input.InputPlugin;
-    public onPointerWheel?: Phaser.Input.InputPlugin;
-
+    // FUTURE: Phaser.Input.Pointer contains a "buttons" property which can be used to determine which buttons a user is holding.
+    // We may want to use helper variables to make the code more readable, but either way, these should be revisited as we build out global event handlers.
     public isPointerHeldDown = false;
     public isMiddleMouseHeldDown = false;
 
@@ -56,8 +50,6 @@ export class Game extends Scene
     }
 
     addControls(): void {
-        // TODO: We currently care more about pointer than currentlyOver, but we'll need to make sure we can get references
-        // to the objects users click on.
         this.input.addListener('pointerdown', (pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]) => {
             this.isPointerHeldDown = true;
 
