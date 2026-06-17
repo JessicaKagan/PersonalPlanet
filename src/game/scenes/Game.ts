@@ -23,6 +23,7 @@ export class Game extends Scene
     public onPointerWheel?: Phaser.Input.InputPlugin;
 
     public isPointerHeldDown = false;
+    public isMiddleMouseHeldDown = false;
 
     constructor ()
     {
@@ -53,18 +54,29 @@ export class Game extends Scene
         // to the objects users click on.
         this.input.addListener('pointerdown', (pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]) => {
             this.isPointerHeldDown = true;
+
+            if (pointer.button == 1) {
+                this.isMiddleMouseHeldDown = true;
+            }
         });
 
         this.input.addListener('pointerup', (pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]) => {
             this.isPointerHeldDown = false;
-
-            console.log(pointer);
-            console.log(currentlyOver);
+            this.isMiddleMouseHeldDown = false;
         });
 
         this.input.addListener('pointermove', (pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]) => {
-            if (this.isPointerHeldDown) {
-                // TODO: Moving the mouse while your pointer is held down should result in camera movements, at least for PP-3-1, 
+            // For camera movement...
+            if (this.isMiddleMouseHeldDown) {
+                // ... drag the camera based on the user's mouse movement...
+                const delta = {
+                    x: pointer.position.x - pointer.prevPosition.x,
+                    y: pointer.position.y - pointer.prevPosition.y
+                };
+
+                this.camera.setScroll(this.camera.scrollX - delta.x, this.camera.scrollY - delta.y);
+                // ... TODO: then clamp to valid positions in the world.
+                // console.log(this.camera.getBounds());
             }
         });
 
