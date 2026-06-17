@@ -114,7 +114,7 @@ export class Game extends Scene
                         y * tileSize,
                         tileSize,
                         tileSize,
-                        this.getTileTextureKey(tile.terrainType)
+                        this.world.getTileTextureKey(tile.terrainType)
                     );
                     
                     // Set the sprite to be at the correct position in world space
@@ -125,44 +125,6 @@ export class Game extends Scene
                     this.tileMap.push(tileSprite);
                 }
             }
-        }
-    }
-
-    getTileTextureKey(terrainType: TerrainType): string {
-        // Map terrain types to texture keys
-        switch (terrainType) {
-            case TerrainType.OCEAN:
-                return 'ocean';
-            case TerrainType.ICE_CAP:
-                return 'ice';
-            case TerrainType.FRESHWATER:
-                return 'shallow water';
-            case TerrainType.POLAR:
-                return 'tundra';
-            case TerrainType.TUNDRA:
-                return 'tundra snowy';
-            case TerrainType.TAIGA:
-                return 'taiga';
-            case TerrainType.COLD_DESERT:
-                return 'coldcliff';
-            case TerrainType.STEPPE:
-                return 'savannah';
-            case TerrainType.GRASSLAND:
-                return 'grass';
-            case TerrainType.TEMPERATE_FOREST:
-                return 'forest';
-            case TerrainType.TEMPERATE_SWAMP:
-                return 'swamp';
-            case TerrainType.HOT_DESERT:
-                return 'sand';
-            case TerrainType.TROPICAL_GRASSLAND:
-                return 'junglegrass';
-            case TerrainType.TROPICAL_FOREST:
-                return 'forest';
-            case TerrainType.TROPICAL_SWAMP:
-                return 'swamp';
-            default:
-                return 'ocean'; // Default fallback
         }
     }
     
@@ -218,7 +180,7 @@ export class Game extends Scene
             
             if (this.tileMap[index]) {
                 // Update the texture of the sprite
-                this.tileMap[index].setTexture(this.getTileTextureKey(tile.terrainType));
+                this.tileMap[index].setTexture(this.world.getTileTextureKey(tile.terrainType));
             }
         }
     }

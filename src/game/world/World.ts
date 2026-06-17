@@ -153,4 +153,42 @@ export class World {
             }
         }
     }
+
+    /* Map terrain types to texture keys */
+    public getTileTextureKey(terrainType: TerrainType): string {
+        switch (terrainType) {
+            case TerrainType.OCEAN:
+                return 'ocean';
+            case TerrainType.ICE_CAP:
+                return 'ice';
+            case TerrainType.FRESHWATER:
+                return 'shallow water';
+            case TerrainType.POLAR:
+                return 'tundra';
+            case TerrainType.TUNDRA:
+                return 'tundra snowy';
+            case TerrainType.TAIGA:
+                return 'taiga';
+            case TerrainType.COLD_DESERT:
+                return 'coldcliff';
+            case TerrainType.STEPPE:
+                return 'savannah';
+            case TerrainType.GRASSLAND:
+                return 'grass';
+            case TerrainType.TEMPERATE_FOREST:
+                return 'forest';
+            case TerrainType.TEMPERATE_SWAMP:
+                return 'swamp';
+            case TerrainType.HOT_DESERT:
+                return 'sand';
+            case TerrainType.TROPICAL_GRASSLAND:
+                return 'junglegrass';
+            case TerrainType.TROPICAL_FOREST:
+                return 'forest';
+            case TerrainType.TROPICAL_SWAMP:
+                return 'swamp';
+            default:
+                return 'ocean'; // Default fallback
+        }
+    }
 }
