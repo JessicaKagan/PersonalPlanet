@@ -1,15 +1,34 @@
 <script lang="ts">
     import RootMenu from "../root_menu.svelte";
+    import { WorldControlsTools } from "../../../game/defines";
+
+    import PhaserGame, { type TPhaserRef } from "../../../PhaserGame.svelte";
+
+    //  References to the PhaserGame component (game and scene are exposed)
+    let phaserRef: TPhaserRef = { game: null, scene: null};
 
     let {
         class: propsClass = ""
     } = $props()
 
+    const selectTool = (tool: WorldControlsTools): void => {
+        const canUseTools = phaserRef.scene?.scene.key === "Game";
+
+        if (canUseTools) {
+            // TODO: Figure out how to pass this information to the game scene,
+            // with the intent of setting the current tool.
+            // This information will eventually be used by event handlers.
+        }
+        
+    }
+
 </script>
 
 <RootMenu class={propsClass}>
-    <button class="controls" title="Query" aria-label="query">🔍</button>
-    <button class="controls" title="Draw" aria-label="draw">🖌️</button>
+    <!-- FUTURE: We should consider sourcing different icons here, since emojis vary from platform to platform.
+        These could either be images or SVGs. Potentially even a combination of the two. Material Symbols works well for the latter. -->
+    <button class="controls" title="Query" aria-label="query" onclick={() => selectTool(WorldControlsTools.Query)}>🔍</button>
+    <button class="controls" title="Draw" aria-label="draw" onclick={() => selectTool(WorldControlsTools.Draw)}>🖌️</button>
 </RootMenu>
 
 <style lang="scss">

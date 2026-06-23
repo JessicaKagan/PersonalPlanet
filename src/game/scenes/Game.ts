@@ -19,6 +19,8 @@ export class Game extends Scene
     public isPointerHeldDown = false;
     public isMiddleMouseHeldDown = false;
 
+    public currentWorldControlTool = WorldControlsTools.None;
+
     constructor ()
     {
         super('Game');
