@@ -3,12 +3,7 @@ import { Scene } from 'phaser';
 import { TerrainType } from '../world/TerrainType';
 import { World, DEFAULT_WORLD_SIZE } from '../world/World';
 import { DEFAULT_TILE_SIZE } from '../world/Tile';
-
-const DEFAULT_SIMULATION_TICKS_PER_SECOND = 50;
-
-const MINIMUM_ZOOM_FACTOR = 1;
-const MAXIMUM_ZOOM_FACTOR = 1 / 16;
-const DEFAULT_ZOOM_TICK = Math.sqrt(2); // Using a number that "cleanly" multiplies into 2 allows the user finer zooming, while keeping the values predictable.
+import { DEFAULT_SIMULATION_TICKS_PER_SECOND, DEFAULT_ZOOM_TICK, MINIMUM_ZOOM_FACTOR, MAXIMUM_ZOOM_FACTOR, WorldControlsTools } from '../defines';
 
 export class Game extends Scene
 {
