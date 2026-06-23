@@ -11,13 +11,15 @@
 
 </script>
 
-<menu>
+<menu class="menu-container">
     <slot></slot>
 </menu>
 
 <style lang="scss">
     menu {
         pointer-events: auto;
-        background-color: green; // DEBUG
+        background-color: #cafffa94;
+        border-radius: 16px;
+        filter: drop-shadow(2px 2px 8px black);
     }
 </style>
