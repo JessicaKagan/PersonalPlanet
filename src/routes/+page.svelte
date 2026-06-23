@@ -80,10 +80,23 @@
 
     }
     
+    const isInGame = (): boolean => {
+        return phaserRef.scene?.scene.key === "Game";
+    }
 </script>
 
 <div id="app">
     <PhaserGame bind:phaserRef={phaserRef} currentActiveScene={currentScene} />
+    
+    <!-- The parent div for all UX components rendered on top of the game. -->
+    <div id="app-ui">
+        {#if isInGame() == true}
+        <!-- <RootDialog></RootDialog> -->
+        <RootMenu></RootMenu>
+        {/if}
+    </div>
+
+    <!-- FUTURE: These debugging controls from the template will be eventually be removed. -->
     <div>
         <div>
             <button class="button" on:click={changeScene}>Change Scene</button>
@@ -101,7 +114,7 @@
     </div>
 </div>
 
-<style>
+<style lang="scss">
     #app {
         width: 100%;
         height: 100vh;
@@ -109,6 +122,15 @@
         display: flex;
         justify-content: center;
         align-items: center;
+
+        &-ui {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+
+            // Pointer events should pass through to the UI container's children, or the Phaser game instance if there's nothing present.
+            pointer-events: none;
+        }
     }
     
     .spritePosition {
