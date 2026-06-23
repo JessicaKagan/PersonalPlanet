@@ -4,6 +4,8 @@
     import type { MainMenu } from "../game/scenes/MainMenu";
     import PhaserGame, { type TPhaserRef } from "../PhaserGame.svelte";
 
+    import WorldControls from "../lib/components/menus/world_controls.svelte";
+
     // The sprite can only be moved in the MainMenu Scene
     let canMoveSprite = false;
 
@@ -91,8 +93,7 @@
     <!-- The parent div for all UX components rendered on top of the game. -->
     <div id="app-ui">
         {#if isInGame() == true}
-        <!-- <RootDialog></RootDialog> -->
-        <RootMenu></RootMenu>
+            <WorldControls></WorldControls>
         {/if}
     </div>
 
