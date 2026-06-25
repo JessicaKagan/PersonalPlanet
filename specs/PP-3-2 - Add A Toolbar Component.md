@@ -5,6 +5,6 @@ This is a subset of PP-3. In this ticket, we'll be building out the user interfa
     * Specific dialogs will be separate components that inherit from the core dialog.
 * Create the toolbar component itself - a dialog with a palette of tools (selectable by button) for interacting with the world. This is a core feature that will see frequent development as we add more to the simulation.
     * This component is similar to something you'd find in a paint program or photo editor.
-* Add a testing feature to the toolbar. This will most likely the MVP for a "query" tool.
+* Add a testing feature to the toolbar. This will most likely be the MVP for a "query" tool.
     * The primary purpose of this is to test the Phaser/Svelte integration and provide a baseline for further toolbar components.
     * A query tool in particular will ensure that we can send UX state information to Phaser, run relevant game logic, and then send that information to the UX layer.

@@ -64,6 +64,8 @@ export class Game extends Scene
         this.input.addListener('pointerup', (pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]) => {
             this.isPointerHeldDown = false; 
             this.isMiddleMouseHeldDown = false;
+
+            // TODO: As part of PP-3-2, users should be able to click on a tile and pin information about it in the UI.
         });
 
         this.input.addListener('pointermove', (pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]) => {
@@ -76,6 +78,25 @@ export class Game extends Scene
 
                 // The camera bounds we set ensure that users can't scroll outside their worlds.
                 this.camera.setScroll(this.camera.scrollX - delta.x, this.camera.scrollY - delta.y);
+            } else {
+                switch (this.currentWorldControlTool) {
+                    case WorldControlsTools.Query:
+                        const currentTileSprite = currentlyOver.find(gameObject => gameObject.type === 'TileSprite');
+
+                        if (!currentTileSprite) {
+                            return;
+                        }
+
+                        const currentWorldTile = this.world.getTile(currentTileSprite.data.values['worldX'], currentTileSprite.data.values['worldY'])
+                        console.log('currentWorldTile', currentWorldTile);
+
+                        // TODO: For PP-3-2 next step is to make this information accessible to a dialog. We'll most likely use the same one for
+                        // the mouseover and click variants.
+
+                        break;
+                    default:
+                        break;
+                }
             }
         });
 
