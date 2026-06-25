@@ -2,22 +2,26 @@
     import RootMenu from "../root_menu.svelte";
     import { WorldControlsTools } from "../../../game/defines";
 
-    import PhaserGame, { type TPhaserRef } from "../../../PhaserGame.svelte";
+    import type { TPhaserRef } from "../../../PhaserGame.svelte";
+    import type { Game } from "../../../game/scenes/Game";
 
-    //  References to the PhaserGame component (game and scene are exposed)
-    let phaserRef: TPhaserRef = { game: null, scene: null};
+    interface WorldControlProps {
+        class?: string,
+        phaserRef: TPhaserRef
+    }
 
     let {
-        class: propsClass = ""
-    } = $props()
+        class: propsClass = "",
+        phaserRef: phaserRef = { game: null, scene: null }
+    }: WorldControlProps = $props()
 
     const selectTool = (tool: WorldControlsTools): void => {
-        const canUseTools = phaserRef.scene?.scene.key === "Game";
+        // FUTURE: This "typecast to the relevant scene type" pattern was taken from the Phaser Svelte template.
+        // Is this a clean and safe way to get the information we need passed in? If not, we'll want to update it at some point.
+        const scene = phaserRef.scene as Game;
 
-        if (canUseTools) {
-            // TODO: Figure out how to pass this information to the game scene,
-            // with the intent of setting the current tool.
-            // This information will eventually be used by event handlers.
+        if (scene) {
+            scene.currentWorldControlTool = tool;
         }
         
     }

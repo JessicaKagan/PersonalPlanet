@@ -90,10 +90,11 @@
 <div id="app">
     <PhaserGame bind:phaserRef={phaserRef} currentActiveScene={currentScene} />
     
-    <!-- The parent div for all UX components rendered on top of the game. -->
+    <!-- The parent div for all UX components rendered on top of the game. 
+        Any component that needs to interact with the gamestate will need a phaserRef passed in. -->
     <div id="app-ui">
         {#if isInGame() == true}
-            <WorldControls></WorldControls>
+            <WorldControls phaserRef={phaserRef}></WorldControls>
         {/if}
     </div>
 

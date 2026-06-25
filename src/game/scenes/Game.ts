@@ -19,7 +19,14 @@ export class Game extends Scene
     public isPointerHeldDown = false;
     public isMiddleMouseHeldDown = false;
 
-    public currentWorldControlTool = WorldControlsTools.None;
+    private _currentWorldControlTool = WorldControlsTools.None;
+    public get currentWorldControlTool(): WorldControlsTools {
+        return this._currentWorldControlTool;
+    }
+
+    public set currentWorldControlTool(tool: WorldControlsTools) {
+        this._currentWorldControlTool = tool;
+    }
 
     constructor ()
     {
