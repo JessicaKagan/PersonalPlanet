@@ -42,6 +42,10 @@ export class Game extends Scene
         
         this.camera = this.cameras.main;
         this.camera.setBackgroundColor(0x000000);
+        
+        // FUTURE: Allowing the camera to scroll slightly (2-3 tiles) past the world bounds will help make tiles easier to interact with
+        // and make absolutely certain that users can view the entire world. I'd like to eventually make the world wrap horizontally,
+        // so any implementation before that would need to be revised afterwards.
         this.camera.setBounds(0, 0, DEFAULT_WORLD_SIZE.x * DEFAULT_TILE_SIZE, DEFAULT_WORLD_SIZE.y * DEFAULT_TILE_SIZE);
 
         // Render the initial state of the world
