@@ -40,6 +40,7 @@ export class Preloader extends Scene
             { key: 'algae green', url: '/tiles/algae green.png' },
             { key: 'basalt', url: '/tiles/basalt.png' },
             { key: 'algae green', url: '/tiles/cave gravel 2.png' },
+            { key: 'coldcliff', url: '/tiles/coldcliff.png' },
             { key: 'clay', url: '/tiles/clay.png' },
             { key: 'cliff ice', url: '/tiles/cliff ice.png' },
             { key: 'cliff', url: '/tiles/cliff.png' },
@@ -65,6 +66,7 @@ export class Preloader extends Scene
             { key: 'swamp', url: '/tiles/swamp grass mar.png' },
             { key: 'taiga', url: '/tiles/taiga.png' },
             { key: 'tundra', url: '/tiles/tundra.png' },
+            { key: 'tundra snowy', url: '/tiles/tundra snowy.png' },
 
             // FUTURE: We'll remove assets once we have more clarity on what sorts of tiles we want to include.
 
@@ -88,7 +90,6 @@ export class Preloader extends Scene
             // { key: 'algae green', url: 'tiles/caveCliff5.png' },
             // { key: 'algae green', url: 'tiles/cavewater.png' },
             // { key: 'algae green', url: 'tiles/coldCaveGravel.png' },
-            // { key: 'algae green', url: 'tiles/coldcliff.png' },
             // { key: 'algae green', url: 'tiles/construction path snowy.png' },
             // { key: 'algae green', url: 'tiles/construction path.png' },
             // { key: 'algae green', url: 'tiles/coral black weakened.png' },
@@ -147,7 +148,6 @@ export class Preloader extends Scene
             // { key: 'algae green', url: 'tiles/thornfloor dry.png' },
             // { key: 'algae green', url: 'tiles/thornfloor snowy.png' },
             // { key: 'algae green', url: 'tiles/thornfloor.png' },
-            // { key: 'algae green', url: 'tiles/tundra snowy.png' },
             // { key: 'algae green', url: 'tiles/water.png' },
             // { key: 'algae green', url: 'tiles/wood tile.png' },
             // { key: 'algae green', url: 'tiles/wood wall.png' },
