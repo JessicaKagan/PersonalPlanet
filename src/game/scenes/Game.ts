@@ -123,9 +123,15 @@ export class Game extends Scene
                         this.world.getTileTextureKey(tile.terrainType)
                     );
                     
-                    tileSprite.setPosition(x * tileSize, y * tileSize); // Set the sprite to be at the correct position in world space
+                    // Set the sprite to be at the correct position in world space.
+                    tileSprite.setPosition(x * tileSize, y * tileSize);
                     tileSprite.setScale(1);
-                    tileSprite.setInteractive(); // Users should be able to click on tiles to interact with them.
+                    
+                    // Users should be able to click on tiles to interact with them.
+                    tileSprite.setInteractive(); 
+                    
+                    // Including tracking data from the tile proper allows us to interact with the world more easily.
+                    tileSprite.setData({tileID: tile.id, worldX: tile.x, worldY: tile.y})
                     
                     // Store reference for potential updates
                     this.tileMap.push(tileSprite);
