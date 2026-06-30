@@ -19,13 +19,18 @@
 
     EventBus.on(CustomPhaserEvents.CurrentWorldControlToolSelected, (tool: WorldControlsTools) => {
         currentWorldControlTool = tool;
+        const tileInformationDialog = document.querySelector('#tile-information-dialog') as HTMLDialogElement;
+
+        if (currentWorldControlTool == WorldControlsTools.Query) {
+            tileInformationDialog?.show();
+        }
     });
 
     const canShowTileInformationDialog: boolean = $derived.by(() => {
         // TODO: This dialog is eligible to be displayed in the following two cases:
         // 1. The query tool is selected.
-        // 2. (Not implemented yet) The user has clicked on a tile with the query tool active and hasn't dismissed the detailed version dialog after doing so.
         return currentWorldControlTool == WorldControlsTools.Query;
+        // 2. (Not implemented yet) The user has clicked on a tile with the query tool active and hasn't dismissed the detailed version dialog after doing so.
     });
 
     const changeScene = () => {
@@ -111,9 +116,7 @@
         {#if isInGame() == true}
             <WorldControls phaserRef={phaserRef}></WorldControls>
 
-            {#if canShowTileInformationDialog == true}
-                <TileInformation phaserRef={phaserRef}></TileInformation>
-            {/if}
+            <TileInformation phaserRef={phaserRef} class='tile-information-menu'></TileInformation>
         {/if}
     </div>
 

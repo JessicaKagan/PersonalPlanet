@@ -7,10 +7,16 @@
         </RootDialog>
 -->
 <script lang="ts">
+    interface RootDialogProps {
+        id?: string
+    }
 
+    let {
+        id: propsId = "",
+    }: RootDialogProps = $props()
 </script>
 
-<dialog class="dialog-container">
+<dialog class="dialog-container" id={propsId}>
     <slot></slot>
 </dialog>
 

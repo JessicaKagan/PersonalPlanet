@@ -3,7 +3,14 @@ import { Scene } from 'phaser';
 import { TerrainType } from '../world/TerrainType';
 import { World, DEFAULT_WORLD_SIZE } from '../world/World';
 import { DEFAULT_TILE_SIZE } from '../world/Tile';
-import { DEFAULT_SIMULATION_TICKS_PER_SECOND, DEFAULT_ZOOM_TICK, MINIMUM_ZOOM_FACTOR, MAXIMUM_ZOOM_FACTOR, WorldControlsTools } from '../defines';
+import { 
+    DEFAULT_SIMULATION_TICKS_PER_SECOND,
+    DEFAULT_ZOOM_TICK,
+    MINIMUM_ZOOM_FACTOR,
+    MAXIMUM_ZOOM_FACTOR,
+    WorldControlsTools,
+    CustomPhaserEvents
+} from '../defines';
 
 export class Game extends Scene
 {
@@ -24,8 +31,14 @@ export class Game extends Scene
         return this._currentWorldControlTool;
     }
 
+    /**
+     * @warning As a general rule, when the user changes their tool (or a function changes it programatically),
+     * components should interact with that by consuming the CurrentWorldControlToolSelected event, instead of directly following up.
+     * This helps keep functions simple and helps separate concerns.
+     */
     public set currentWorldControlTool(tool: WorldControlsTools) {
         this._currentWorldControlTool = tool;
+        EventBus.emit(CustomPhaserEvents.CurrentWorldControlToolSelected, this.currentWorldControlTool);
     }
 
     constructor ()
@@ -70,6 +83,7 @@ export class Game extends Scene
             this.isMiddleMouseHeldDown = false;
 
             // TODO: As part of PP-3-2, users should be able to click on a tile and pin information about it in the UI.
+            // We'll unset the current world control tool when this happens.
         });
 
         this.input.addListener('pointermove', (pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]) => {
