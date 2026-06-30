@@ -18,6 +18,8 @@
 <style lang="scss">
     menu {
         pointer-events: auto;
+
+        // FUTURE: Move this block of styles into a shared "UI window" style that we can apply to dialogs, menus, and any other other components that need them.
         background-color: #cafffa94;
         border-radius: 16px;
         filter: drop-shadow(2px 2px 8px black);
