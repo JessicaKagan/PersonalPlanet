@@ -20,3 +20,4 @@ More details on the query tool MVP (added as of 6/25/2026):
     * We should render additional controls for the dialog in this case, such as a button to close the dialog, and a way to pan the camera to the queried tile.
     * Is it possible to show the tile contents in the dialog? We could render tiles as background images, but if we add more features, this won't be enough. The ideal solution, from my perspective, is being able to dynamically capture an image of the tile and send that to the UX layer.
     * In addition to showing the dialog, we should display graphics in Phaser to indicate that the tile is being queried. Maybe a magnifying glass animation?
+    * FUTURE: Let's figure out if any tools or in-game interactions should automatically close this dialog.

@@ -5,13 +5,28 @@
     import PhaserGame, { type TPhaserRef } from "../PhaserGame.svelte";
 
     import WorldControls from "../lib/components/menus/world_controls.svelte";
+    import TileInformation from "../lib/components/dialogs/tile_information.svelte";
+    import { CustomPhaserEvents, WorldControlsTools } from "../game/defines";
+    import { EventBus } from "../game/EventBus";
 
     // The sprite can only be moved in the MainMenu Scene
-    let canMoveSprite = false;
+    let canMoveSprite = $state(false);
+    let currentWorldControlTool: WorldControlsTools = $state(WorldControlsTools.None);
 
     //  References to the PhaserGame component (game and scene are exposed)
-    let phaserRef: TPhaserRef = { game: null, scene: null};
+    let phaserRef: TPhaserRef = $state({ game: null, scene: null});
     const spritePosition = { x: 0, y: 0 };
+
+    EventBus.on(CustomPhaserEvents.CurrentWorldControlToolSelected, (tool: WorldControlsTools) => {
+        currentWorldControlTool = tool;
+    });
+
+    const canShowTileInformationDialog: boolean = $derived.by(() => {
+        // TODO: This dialog is eligible to be displayed in the following two cases:
+        // 1. The query tool is selected.
+        // 2. (Not implemented yet) The user has clicked on a tile with the query tool active and hasn't dismissed the detailed version dialog after doing so.
+        return currentWorldControlTool == WorldControlsTools.Query;
+    });
 
     const changeScene = () => {
 
@@ -95,6 +110,10 @@
     <div id="app-ui">
         {#if isInGame() == true}
             <WorldControls phaserRef={phaserRef}></WorldControls>
+
+            {#if canShowTileInformationDialog == true}
+                <TileInformation phaserRef={phaserRef}></TileInformation>
+            {/if}
         {/if}
     </div>
 

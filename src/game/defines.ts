@@ -9,6 +9,19 @@ export const MINIMUM_ZOOM_FACTOR = 1;
 export const MAXIMUM_ZOOM_FACTOR = 1 / 16;
 export const DEFAULT_ZOOM_TICK = Math.sqrt(2); // Using a number that "cleanly" multiplies into 2 allows the user finer zooming, while keeping the values predictable.
 
+
+/** These enums are used by components in the UX layer. */
 export enum WorldControlsTools {
     None, Query, Draw
+}
+
+export enum TileInformationDialogMode {
+    HOVER,
+    DETAILED
+}
+
+/** These enums are used when we want to emit and subscribe to Phaser events. */
+export enum CustomPhaserEvents {
+    CurrentSceneReady = 'CurrentSceneReady',
+    CurrentWorldControlToolSelected = 'CurrentWorldControlToolSelected'
 }
