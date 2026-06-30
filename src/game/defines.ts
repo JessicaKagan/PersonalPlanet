@@ -3,12 +3,13 @@
  * to become defaults.
  */
 
+import type { Tile } from "./world/Tile";
+
 export const DEFAULT_SIMULATION_TICKS_PER_SECOND = 50;
 
 export const MINIMUM_ZOOM_FACTOR = 1;
 export const MAXIMUM_ZOOM_FACTOR = 1 / 16;
 export const DEFAULT_ZOOM_TICK = Math.sqrt(2); // Using a number that "cleanly" multiplies into 2 allows the user finer zooming, while keeping the values predictable.
-
 
 /** These enums are used by components in the UX layer. */
 export enum WorldControlsTools {
@@ -25,4 +26,11 @@ export enum CustomPhaserEvents {
     CurrentSceneReady = 'CurrentSceneReady',
     CurrentWorldControlToolSelected = 'CurrentWorldControlToolSelected',
     CursorPositionInViewPort = 'CurrentPositionInViewPort'
+}
+
+/** FUTURE: This interface will be expanded as we add more to the simulation that we'd like to show using the query tool.
+ */
+export interface QueryInfo {
+    tile?: Tile;
+    customText?: string;
 }

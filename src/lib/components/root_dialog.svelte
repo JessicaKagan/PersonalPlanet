@@ -34,5 +34,10 @@
         background-color: #cafffa94;
         border-radius: 16px;
         filter: drop-shadow(2px 2px 8px black);
+
+        // FUTURE: This and other overrides should most likely go into a shared text styles section.
+        h1, h2, h3, h4, h5, h6 {
+            margin: 0 8px 0 0;
+        }
     }
 </style>

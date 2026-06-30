@@ -6,35 +6,35 @@ export enum TerrainType {
     /**
      * Empty or undefined terrain
      */
-    EMPTY,
+    EMPTY = "Void",
 
     /** Water terrains */
 
-    OCEAN,
-    ICE_CAP,
+    OCEAN = "Ocean",
+    ICE_CAP = "Ice Cap",
 
     /** Lakes, possibly rivers? */
-    FRESHWATER,
+    FRESHWATER = "Fresh Water",
 
     /** Cold land terrains */
 
-    POLAR, 
-    TUNDRA,
-    TAIGA,
-    COLD_DESERT,
+    POLAR = "Polar terrain", 
+    TUNDRA = "Tundra",
+    TAIGA = "Taiga",
+    COLD_DESERT = "Cold Desert",
 
     /** Middling temperature land terrains */
 
-    STEPPE,
-    GRASSLAND,
-    TEMPERATE_FOREST,
-    TEMPERATE_SWAMP,
+    STEPPE = "Steppe",
+    GRASSLAND = "Grassland",
+    TEMPERATE_FOREST = "Temperate Forest",
+    TEMPERATE_SWAMP = "Temperate Swamp",
 
     /** Hot land terrains */
 
-    HOT_DESERT,
-    TROPICAL_GRASSLAND,
-    TROPICAL_FOREST,
-    TROPICAL_SWAMP
+    HOT_DESERT = "Hot Desert",
+    TROPICAL_GRASSLAND = "Tropical Grassland",
+    TROPICAL_FOREST = "Tropical Forest",
+    TROPICAL_SWAMP = "Tropical Swamp"
 
 }

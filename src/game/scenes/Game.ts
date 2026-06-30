@@ -2,14 +2,15 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { TerrainType } from '../world/TerrainType';
 import { World, DEFAULT_WORLD_SIZE } from '../world/World';
-import { DEFAULT_TILE_SIZE } from '../world/Tile';
+import { DEFAULT_TILE_SIZE, type Tile } from '../world/Tile';
 import { 
     DEFAULT_SIMULATION_TICKS_PER_SECOND,
     DEFAULT_ZOOM_TICK,
     MINIMUM_ZOOM_FACTOR,
     MAXIMUM_ZOOM_FACTOR,
     WorldControlsTools,
-    CustomPhaserEvents
+    CustomPhaserEvents,
+    type QueryInfo
 } from '../defines';
 
 export class Game extends Scene
@@ -40,6 +41,8 @@ export class Game extends Scene
         this._currentWorldControlTool = tool;
         EventBus.emit(CustomPhaserEvents.CurrentWorldControlToolSelected, this.currentWorldControlTool);
     }
+
+    public currentQueryInfo: QueryInfo = {};
 
     constructor ()
     {
@@ -110,11 +113,7 @@ export class Game extends Scene
                         }
 
                         const currentWorldTile = this.world.getTile(currentTileSprite.data.values['worldX'], currentTileSprite.data.values['worldY'])
-                        console.log('currentWorldTile', currentWorldTile);
-
-                        // TODO: For PP-3-2 next step is to make this information accessible to a dialog. We'll most likely use the same one for
-                        // the mouseover and click variants.
-
+                        this.setQueryInfo(currentWorldTile);
                         break;
                     default:
                         break;
@@ -142,6 +141,21 @@ export class Game extends Scene
                 this.camera.zoom = MAXIMUM_ZOOM_FACTOR;
             }
         });
+    }
+
+    /** Bundle up information about what the user is querying into an easily readable format for other components to view.
+     * FUTURE: This is currently called during mouse movement events when the query tool is selected.
+     * As part of PP-3-2, we'll start calling it in updateSimulation() when the user has clicked a tile to monitor.
+     * We'll probably want to keep track of a "currently selected tile" for this, and potentially other features.
+     */
+    setQueryInfo(tile?: Tile): void {
+        if (!tile) {
+            return;
+        }
+
+        this.currentQueryInfo = {
+            tile
+        }
     }
 
     renderInitialWorld(): void {
