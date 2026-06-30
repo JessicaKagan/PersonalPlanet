@@ -23,5 +23,6 @@ export enum TileInformationDialogMode {
 /** These enums are used when we want to emit and subscribe to Phaser events. */
 export enum CustomPhaserEvents {
     CurrentSceneReady = 'CurrentSceneReady',
-    CurrentWorldControlToolSelected = 'CurrentWorldControlToolSelected'
+    CurrentWorldControlToolSelected = 'CurrentWorldControlToolSelected',
+    CursorPositionInViewPort = 'CurrentPositionInViewPort'
 }

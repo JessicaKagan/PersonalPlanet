@@ -23,6 +23,8 @@
 
         if (currentWorldControlTool == WorldControlsTools.Query) {
             tileInformationDialog?.show();
+        } else {
+            tileInformationDialog?.close();
         }
     });
 

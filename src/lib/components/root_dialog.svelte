@@ -8,15 +8,17 @@
 -->
 <script lang="ts">
     interface RootDialogProps {
-        id?: string
+        id?: string,
+        style?: string
     }
 
     let {
         id: propsId = "",
+        style: propsStyle = ""
     }: RootDialogProps = $props()
 </script>
 
-<dialog class="dialog-container" id={propsId}>
+<dialog class="dialog-container" id={propsId} style={propsStyle}>
     <slot></slot>
 </dialog>
 

@@ -99,6 +99,10 @@ export class Game extends Scene
             } else {
                 switch (this.currentWorldControlTool) {
                     case WorldControlsTools.Query:
+                        // When the query tool is selected, we can assume the tile information dialog is open in hover mode.
+                        // We should send over the mouse coordinates, which will be used to adjust the dialog's position.
+                        EventBus.emit(CustomPhaserEvents.CursorPositionInViewPort, pointer.position);
+
                         const currentTileSprite = currentlyOver.find(gameObject => gameObject.type === 'TileSprite');
 
                         if (!currentTileSprite) {
