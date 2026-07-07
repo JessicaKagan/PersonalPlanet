@@ -10,15 +10,17 @@
     interface RootDialogProps {
         id?: string,
         style?: string
+        class?: string,
     }
 
     let {
         id: propsId = "",
-        style: propsStyle = ""
+        style: propsStyle = "",
+        class: propsClass = ""
     }: RootDialogProps = $props()
 </script>
 
-<dialog class="dialog-container" id={propsId} style={propsStyle}>
+<dialog class='{propsClass} dialog-container' id={propsId} style={propsStyle}>
     <slot></slot>
 </dialog>
 

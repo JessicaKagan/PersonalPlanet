@@ -11,8 +11,6 @@
         phaserRef: TPhaserRef
     }
 
-    // TODO: Figure out how best to handle passing in a dialog mode.
-    // Classes could theoretically work, but mixing prebaked classes and custom classes needs figuring out.
     let dialogMode = TileInformationDialogMode.HOVER;
     let customCSSStyles = $state(''); // Used for positioning.
 
@@ -42,7 +40,10 @@
 
 </script>
 
-<RootDialog id="tile-information-dialog" style={customCSSStyles}>
+<RootDialog
+    id="tile-information-dialog"
+    style={customCSSStyles}
+    class={dialogMode === TileInformationDialogMode.HOVER ? 'hover' : 'detailed'}>
     {#if currentQueryInfo?.tile}
         <section class="tile-information-dialog_section">
             <h3>Tile Details</h3>
@@ -67,6 +68,10 @@
 
             &_section {
                 margin: 8px;
+            }
+
+            &.detailed {
+                height: 320px; // DEBUG
             }
         }
     }
