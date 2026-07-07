@@ -1,0 +1,9 @@
+The goal of this ticket is to create the initial implementation of the Draw tool in the world controls. For now, this will solely be used to edit the terrain of a tile, but we could potentially extend this to add additional objects to the world as we design and implement them.
+
+Much of the groundwork here was implemented in PP-3-2, and in particular its MVP implementation of the query tool. The following subtasks remain:
+* Creating an interface for users to select a tile type for drawing.
+    * Given that we're planning to eventually allow users to do more than just edit tiles, we could handle this by adding a palette tool to the world controls. This is something that we could theoretically use across multiple world controls, allowing us to make do fewer bespoke components. The flipside is that future tools may have restrictions on what kind of palettes are valid for them, which potentially adds complexity around the palette component's modes, as well as cross-component communication.
+* Triggering a terrain type change in the world when the user draws on a tile.
+    * We already have a `setTile` method in the **World** class. It currently replaces the tile object (barring Javascript/Typescript microdetails). Any method at the mouse handling level shouldn't call this directly, but should instead call a relevant drawing function. This function will update the relevant tile properties and then call `setTile` to save the changes to the terrain type
+* Updating the **Tile** class to support indicating when a tile has been manually edited.
+    * This overlaps a bit with PP-4. As Personal Planet approaches more of a game-like state, players may want to be able to freeze some aspect of the world and (for want of better phrasing) protect it from simulation changes.

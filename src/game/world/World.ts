@@ -98,6 +98,8 @@ export class World {
 
     // FUTURE: Why was this function generated?
     // My understanding is that it interfaces with PP-2, based on the plans from the Qwen session that generated this.
+    // This could actually be helpful for running a simulation function on the world, such as any methods we want to implement
+    // in PP-4 onwards.
     /**
      * Updates all tiles in the world with a provided function
      * @param updateFn The function to apply to each tile
