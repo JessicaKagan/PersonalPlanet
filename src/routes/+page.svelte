@@ -32,7 +32,7 @@
             const scene = phaserRef.scene as Game;
             const hasQueryableTile = scene?.currentQueryInfo.tile !== undefined;
 
-            if (currentWorldControlTool !== WorldControlsTools.None || !hasQueryableTile) {
+            if (currentWorldControlTool !== WorldControlsTools.None && !hasQueryableTile) {
                 tileInformationDialog?.close();
             }
         }
