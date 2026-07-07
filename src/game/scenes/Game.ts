@@ -85,8 +85,11 @@ export class Game extends Scene
             this.isPointerHeldDown = false; 
             this.isMiddleMouseHeldDown = false;
 
-            // TODO: As part of PP-3-2, users should be able to click on a tile and pin information about it in the UI.
-            // We'll unset the current world control tool when this happens.
+            if (this.currentWorldControlTool === WorldControlsTools.Query) {
+                // TileInformation will switch to the detailed view, which will stay open until dismissed or the user reselects the query tool.
+                EventBus.emit(CustomPhaserEvents.TileSelected, this.currentQueryInfo);
+                this.currentWorldControlTool = WorldControlsTools.None;
+            }
         });
 
         this.input.addListener('pointermove', (pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]) => {

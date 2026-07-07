@@ -9,6 +9,7 @@
     import TileInformation from "../lib/components/dialogs/tile_information.svelte";
     import { CustomPhaserEvents, WorldControlsTools } from "../game/defines";
     import { EventBus } from "../game/EventBus";
+    import type { Game } from "../game/scenes/Game";
 
     // The sprite can only be moved in the MainMenu Scene
     let canMoveSprite = $state(false);
@@ -22,18 +23,19 @@
         currentWorldControlTool = tool;
         const tileInformationDialog = document.querySelector('#tile-information-dialog') as HTMLDialogElement;
 
+
         if (currentWorldControlTool == WorldControlsTools.Query) {
             tileInformationDialog?.show();
         } else {
-            tileInformationDialog?.close();
-        }
-    });
+            // We should close the dialog either if the user explicitly selected another tool,
+            // or if they end up with no tool selected AND no queryable tile.
+            const scene = phaserRef.scene as Game;
+            const hasQueryableTile = scene?.currentQueryInfo.tile !== undefined;
 
-    const canShowTileInformationDialog: boolean = $derived.by(() => {
-        // TODO: This dialog is eligible to be displayed in the following two cases:
-        // 1. The query tool is selected.
-        return currentWorldControlTool == WorldControlsTools.Query;
-        // 2. (Not implemented yet) The user has clicked on a tile with the query tool active and hasn't dismissed the detailed version dialog after doing so.
+            if (currentWorldControlTool !== WorldControlsTools.None || !hasQueryableTile) {
+                tileInformationDialog?.close();
+            }
+        }
     });
 
     const changeScene = () => {

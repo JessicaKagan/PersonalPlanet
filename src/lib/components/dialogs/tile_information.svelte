@@ -3,7 +3,7 @@
 
     import type { TPhaserRef } from "../../../PhaserGame.svelte";
     import type { Game } from "../../../game/scenes/Game";
-    import { CustomPhaserEvents, TileInformationDialogMode, type QueryInfo } from "../../../game/defines";
+    import { CustomPhaserEvents, TileInformationDialogMode, WorldControlsTools, type QueryInfo } from "../../../game/defines";
     import { EventBus } from "../../../game/EventBus";
 
     interface TileInformationProps {
@@ -11,7 +11,7 @@
         phaserRef: TPhaserRef
     }
 
-    let dialogMode = TileInformationDialogMode.HOVER;
+    let dialogMode = $state(TileInformationDialogMode.HOVER);
     let customCSSStyles = $state(''); // Used for positioning.
 
     let currentQueryInfo: QueryInfo | undefined = $state();
@@ -20,6 +20,12 @@
         class: propsClass = "",
         phaserRef: phaserRef = { game: null, scene: null }
     }: TileInformationProps = $props()
+
+    EventBus.on(CustomPhaserEvents.CurrentWorldControlToolSelected, (tool: WorldControlsTools) => {
+        if (tool == WorldControlsTools.Query) {
+            dialogMode = TileInformationDialogMode.HOVER;
+        }
+    });
 
     EventBus.on(CustomPhaserEvents.CursorPositionInViewPort, (position: Phaser.Math.Vector2) => {
         const scene = phaserRef.scene as Game;
@@ -36,6 +42,11 @@
 
             currentQueryInfo = scene.currentQueryInfo;
         }
+    });
+
+    EventBus.on(CustomPhaserEvents.TileSelected, (queryInfo: QueryInfo) => {
+        dialogMode = TileInformationDialogMode.DETAILED;
+        currentQueryInfo = queryInfo;
     });
 
 </script>

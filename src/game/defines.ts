@@ -25,7 +25,8 @@ export enum TileInformationDialogMode {
 export enum CustomPhaserEvents {
     CurrentSceneReady = 'CurrentSceneReady',
     CurrentWorldControlToolSelected = 'CurrentWorldControlToolSelected',
-    CursorPositionInViewPort = 'CurrentPositionInViewPort'
+    CursorPositionInViewPort = 'CurrentPositionInViewPort',
+    TileSelected = 'TileSelected'
 }
 
 /** FUTURE: This interface will be expanded as we add more to the simulation that we'd like to show using the query tool.
