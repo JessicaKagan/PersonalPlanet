@@ -120,8 +120,22 @@
                 margin: 8px;
             }
 
+            &.hover {
+                position: fixed;
+            }
+
             &.detailed {
-                height: 320px; // DEBUG
+                width: 256px;
+                height: 80%;
+                overflow-y: scroll;
+                position: absolute;
+                top: 64px;
+                left: 80%;
+
+                // Animate the switch from hovering tooltip to detailed window.
+                transition: width height left top;
+                transition-duration: 0.25s;
+                transition-timing-function: ease-in-out;
             }
         }
     }
