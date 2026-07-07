@@ -38,7 +38,7 @@
             // FUTURE: Make the clamping logic here stricter, and consider moving it to a utility function.
             const x = position.x > window.innerWidth ? window.innerWidth : position.x < 0 ? 0 : position.x;
             const y = position.y > window.innerHeight ? window.innerHeight : position.y < 0 ? 0 : position.y;
-            customCSSStyles = `position: fixed; left:${x}px; top:${y}px;`;
+            customCSSStyles = `left:${x}px; top:${y}px;`;
 
             currentQueryInfo = scene.currentQueryInfo;
         }
@@ -47,16 +47,30 @@
     EventBus.on(CustomPhaserEvents.TileSelected, (queryInfo: QueryInfo) => {
         dialogMode = TileInformationDialogMode.DETAILED;
         currentQueryInfo = queryInfo;
+
+        customCSSStyles = ''; // FUTURE: If we have more ways of switching to detailed mode, we may want to move this cleanup step.
     });
 
+    const closeDialog = () => {
+        // Clean up unneeded information before closing the dialog.
+        currentQueryInfo = undefined;
+
+        const tileInformationDialog = document.querySelector('#tile-information-dialog') as HTMLDialogElement;
+        tileInformationDialog?.close();
+    }
 </script>
 
 <RootDialog
     id="tile-information-dialog"
     style={customCSSStyles}
     class={dialogMode === TileInformationDialogMode.HOVER ? 'hover' : 'detailed'}>
+    {#if dialogMode === TileInformationDialogMode.DETAILED}
+        <section id="tile-information-dialog_detailed-controls">
+            <button id="tile-information-dialog_detailed-controls_close" onclick={() => closeDialog()}>❎</button>
+        </section>
+    {/if}
     {#if currentQueryInfo?.tile}
-        <section class="tile-information-dialog_section">
+        <section class="dialog-section">
             <h3>Tile Details</h3>
             <h4>{currentQueryInfo.tile.terrainType}</h4>
             <span>({currentQueryInfo.tile.x}, {currentQueryInfo.tile.y})</span>
@@ -77,7 +91,32 @@
                 background: none;
             }
 
-            &_section {
+            &_detailed-controls {
+                display: flex;
+                flex-direction: row-reverse;
+
+                &_close {
+                    font-size: 32px;
+                    // FUTURE: We should turn off more default browser button styles by default.
+                    background-color: unset;
+                    border: none;
+
+                    // FUTURE: These styles are also in the world controls and should be moved into a dialog/menu button theme.
+                    filter: drop-shadow(2px 2px 8px black);
+
+                    &:hover {
+                        background-color: #ffffff80;
+                    }
+
+                    &:active {
+                        filter: drop-shadow(0 0 4px black);
+                    }
+                }
+            }
+
+
+            // Repeated sections, in case we need an arbitrary number of them. Not to be confused with a bespoke section like the detailed controls.
+            .dialog-section {
                 margin: 8px;
             }
 
