@@ -163,7 +163,9 @@ export class Preloader extends Scene
         //  When all the assets have loaded, it's often worth creating global objects here that the rest of the game can use.
         //  For example, you can define global animations here, so we can use them in other scenes.
 
-        //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
-        this.scene.start('MainMenu');
+        //  Move to the Game. You could also swap this for a Scene Transition, such as a camera fade.
+        // FUTURE: Loading directly to the game window is for early debugging. We'll want to change this back to the menu
+        // when we start implementing a real one.
+        this.scene.start('Game');
     }
 }
