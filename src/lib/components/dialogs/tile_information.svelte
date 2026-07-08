@@ -73,7 +73,13 @@
         <section class="dialog-section">
             <h3>Tile Details</h3>
             <h4>{currentQueryInfo.tile.terrainType}</h4>
-            <span>({currentQueryInfo.tile.x}, {currentQueryInfo.tile.y})</span>
+            <p>({currentQueryInfo.tile.x}, {currentQueryInfo.tile.y})</p>
+            {#if dialogMode === TileInformationDialogMode.DETAILED}
+                <p>Temperature: {currentQueryInfo.tile.temperature}</p>
+                <p>Albedo: {currentQueryInfo.tile.albedo}%</p>
+                <p>Humidity: {currentQueryInfo.tile.humidity}%</p>
+                <p>Elevation: {currentQueryInfo.tile.elevation} meters</p>
+            {/if}
         </section>
     {/if}
 </RootDialog>
