@@ -5,31 +5,54 @@ import { TerrainType } from './TerrainType';
 import type { Tile } from './Tile';
 
 export const DEFAULT_WORLD_SIZE = { x: 64, y: 64 };
+/** 1.361 kilowatts per square meter */
+export const DEFAULT_SOLAR_CONSTANT = 1361;
+/** 32768 meters */
+export const DEFAULT_MAXIMUM_ALTITUDE = 2^15;
+/** 16384 meters */
+export const DEFAULT_SEA_LEVEL = 2^14;
+/** No inherent meaning, because this is a relative number. */
+export const DEFAULT_ROTATION_SPEED = 100;
 
 export class World {
-    /**
-     * The width of the world in tiles
-     */
+    /** BASIC WORLD INFORMATION */
+
+    /** The width of the world in tiles */
     private width: number;
     
-    /**
-     * The height of the world in tiles
-     */
+    /** The height of the world in tiles*/
     private height: number;
     
-    /**
-     * The 2D array of tiles that make up the world
-     */
+    /** The 2D array of tiles that make up the world */
     private tiles: Tile[][];
+
+    /** CLIMATE INFORMATION */
+    
+    /** The amount of sunlight a World gets. The default value resembles the solar constant of Earth in watts per square meter.*/
+    private insolation: number;
+    /** The average sea level of a World. Tiles with heights below this should be assigned TerrainType.OCEAN. */
+    private seaLevel: number;
+    /** How quickly the world rotates. This is an arbitrary percentage. */
+    private rotationSpeed: number;
     
     /**
-     * Creates a new World with the specified dimensions
+     * Create a new, empty World object.
      * @param width The width of the world in tiles
      * @param height The height of the world in tiles
      */
-    constructor(width: number, height: number) {
+    constructor(
+        width: number,
+        height: number,
+        insolation: number = DEFAULT_SOLAR_CONSTANT,
+        seaLevel: number = DEFAULT_SEA_LEVEL,
+        rotationSpeed: number = DEFAULT_ROTATION_SPEED
+    ){
         this.width = width;
         this.height = height;
+        this.insolation = insolation;
+        this.seaLevel = seaLevel;
+        this.rotationSpeed = rotationSpeed;
+
         this.tiles = [];
         
         // Initialize the 2D array with empty tiles
@@ -40,7 +63,11 @@ export class World {
                     id: `${x}-${y}`,
                     x: x,
                     y: y,
-                    terrainType: TerrainType.EMPTY
+                    terrainType: TerrainType.EMPTY,
+                    temperature: 0,
+                    albedo: 0,
+                    humidity: 0,
+                    elevation: 0
                 };
             }
         }

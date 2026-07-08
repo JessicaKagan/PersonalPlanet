@@ -7,19 +7,14 @@ import { TerrainType } from './TerrainType';
 export const DEFAULT_TILE_SIZE = 64;
 
 export interface Tile {
-    /**
-     * Unique identifier for the tile
-     */
+    /** BASIC TILE INFORMATION */
+    /** Unique identifier for the tile. */
     id: string;
     
-    /**
-     * X coordinate of the tile in the world grid
-     */
+    /** X coordinate of the tile in the world grid. */
     x: number;
     
-    /**
-     * Y coordinate of the tile in the world grid
-     */
+    /** Y coordinate of the tile in the world grid. */
     y: number;
     
     /**
@@ -36,6 +31,18 @@ export interface Tile {
      * of the tile. We should investigate this.
      */
     gameObject?: Phaser.GameObjects.Image;
+
+    /** CLIMATE DATA */
+
+    /** The average temperature of a tile. At this level, use Kelvin scale numbers to make for simpler math. */
+    temperature: number;
+    /** How much radiation (in practice, sunlight) the tile reflects. A percentage between 0-100%. */
+    albedo: number;
+    /** How much water is in the atmosphere above a tile. A percentage between 0-100%.
+     *  FUTURE: The relationship between maximum humidity and temperature is complex, so we may want to switch to a more absolute measurement someday. */
+    humidity: number;
+    /** The average relative height of a tile in meters. Use positive numbers here, probably capped to a maximum of 2^15 meters for versimilitude. */
+    elevation: number;
 
     // FUTURE: What use cases are there for having arbitrary metadata in a tile?
     // We can remove this in the future if we want to discourage the pattern.
