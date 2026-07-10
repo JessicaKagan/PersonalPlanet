@@ -1,6 +1,4 @@
-TODO: Figure out some climate modeling! This is an area where we need to decide how realistic we're interested in making things. This doesn't have to go in very early.
-
-Some brainstorming:
+This is a brainstorming ticket. A few requirements we know about:
 * The player's world is heated by a source (presumably a sun).
 * The player's world absorbs some of the heat, but reflects some of it (depending on albedo), and radiates some more. This means there's a maximum amount of hot the overall system gets.
 * The player's world contains X amount of water, mostly in water terrain tiles. It should, to some extent, evaporate and spread through the world.
