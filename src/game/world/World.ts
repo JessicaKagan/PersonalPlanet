@@ -3,14 +3,15 @@
  */
 import { TerrainType } from './TerrainType';
 import type { Tile } from './Tile';
+import { createNoise2D } from 'simplex-noise';
 
 export const DEFAULT_WORLD_SIZE = { x: 64, y: 64 };
 /** 1.361 kilowatts per square meter */
 export const DEFAULT_SOLAR_CONSTANT = 1361;
 /** 32768 meters */
-export const DEFAULT_MAXIMUM_ALTITUDE = 2^15;
+export const DEFAULT_MAXIMUM_ALTITUDE = Math.pow(2, 15);
 /** 16384 meters */
-export const DEFAULT_SEA_LEVEL = 2^14;
+export const DEFAULT_SEA_LEVEL = Math.pow(2, 14);
 /** No inherent meaning, because this is a relative number. */
 export const DEFAULT_ROTATION_SPEED = 100;
 
@@ -131,7 +132,7 @@ export class World {
      * Updates all tiles in the world with a provided function
      * @param updateFn The function to apply to each tile
      */
-    updateAllTiles(updateFn: (tile: Tile) => Tile): void {
+    public updateAllTiles(updateFn: (tile: Tile) => Tile): void {
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
                 this.tiles[x][y] = updateFn(this.tiles[x][y]);
@@ -140,47 +141,39 @@ export class World {
     }
 
     /**
-     * Fill a World object with tiles. Currently, this simply generates a variety of random tiles for testing.
+     * Fill a World object with tiles. The methods here are loosely pulled from https://www.redblobgames.com/maps/terrain-from-noise/.
      * FUTURE: Add an argument for which mode we'll use to populate the world. The current one will be a "generate new world" method.
      * We'll also want to add a "load from save" method.
      */
-    populateWorld()
-    {
-        for (let x = 0; x < this.getWidth(); x++) {
-            for (let y = 0; y < this.getHeight(); y++) {
+    public populateWorld(): void {
+        const simplexNoise = createNoise2D();
+        
+        this.updateAllTiles(tile => {
+            // Generate an initial height for each tile by mashing together and convoluting a few polled simplex noise targets.
+            let noiseFrequencies = {
+                large: simplexNoise(1042, (tile.x * this.width) + tile.y),
+                medium: simplexNoise(512, (tile.x * this.width) + tile.y),
+                small: simplexNoise(256, (tile.x * this.width) + tile.y),
+            } 
+            
+            const combinedNoiseResult = (noiseFrequencies.small + noiseFrequencies.medium + noiseFrequencies.large) / (1 + 0.5 + 0.25);
+            const poweredNoiseResult = Math.pow(combinedNoiseResult, 2);
 
-                // Create a simple pattern of terrain types
-                let terrainType: TerrainType;
-                
-                if (x < 3 && y < 3) {
-                    terrainType = TerrainType.OCEAN;
-                } else if (x >= 7 && y >= 7) {
-                    terrainType = TerrainType.TUNDRA;
-                } else if (x > 3 && x < 7 && y > 3 && y < 7) {
-                    terrainType = TerrainType.GRASSLAND;
-                } else {
-                    // Random terrain for the rest
-                    const terrainTypes = [
-                        TerrainType.FRESHWATER,
-                        TerrainType.POLAR,
-                        TerrainType.TAIGA,
-                        TerrainType.COLD_DESERT,
-                        TerrainType.STEPPE,
-                        TerrainType.TEMPERATE_FOREST,
-                        TerrainType.TEMPERATE_SWAMP,
-                        TerrainType.HOT_DESERT,
-                        TerrainType.TROPICAL_GRASSLAND,
-                        TerrainType.TROPICAL_FOREST
-                    ];
-                    terrainType = terrainTypes[Math.floor(Math.random() * terrainTypes.length)];
-                }
-                
-                const tile = this.getTile(x, y);
-                if (tile) {
-                    tile.terrainType = terrainType;
-                }
+            let elevationVariance = combinedNoiseResult > 0 ?
+                Math.floor(poweredNoiseResult * 2048) :
+                Math.floor(poweredNoiseResult * -2048);
+
+            tile.elevation = this.seaLevel + elevationVariance;
+
+            // For this step, terrain type is solely based on 
+            if (tile.elevation < this.seaLevel) {
+                tile.terrainType = TerrainType.OCEAN;
+            } else {
+                tile.terrainType = TerrainType.GRASSLAND;
             }
-        }
+
+            return tile;
+        })
     }
 
     /* Map terrain types to texture keys */
