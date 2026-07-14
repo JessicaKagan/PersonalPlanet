@@ -15,6 +15,10 @@ export const DEFAULT_SEA_LEVEL = Math.pow(2, 14);
 /** No inherent meaning, because this is a relative number. */
 export const DEFAULT_ROTATION_SPEED = 100;
 
+// FUTURE: Investigate if there's any reason to have separate noise functions across components in Personal Planet.
+// If not, we should move this somewhere more central.
+const simplexNoise = createNoise2D();
+
 export class World {
     /** BASIC WORLD INFORMATION */
 
@@ -123,13 +127,10 @@ export class World {
         return this.tiles;
     }
     
-
-    // FUTURE: Why was this function generated?
-    // My understanding is that it interfaces with PP-2, based on the plans from the Qwen session that generated this.
-    // This could actually be helpful for running a simulation function on the world, such as any methods we want to implement
-    // in PP-4 onwards.
     /**
-     * Updates all tiles in the world with a provided function
+     * Updates all tiles in the world with a provided callback function. This is helpful when you're running either world generation
+     * or world simulation logic and need to update the status of the entire world.
+     * @warning This function was generated from a Qwen + Zoo Code session.
      * @param updateFn The function to apply to each tile
      */
     public updateAllTiles(updateFn: (tile: Tile) => Tile): void {
@@ -146,34 +147,35 @@ export class World {
      * We'll also want to add a "load from save" method.
      */
     public populateWorld(): void {
-        const simplexNoise = createNoise2D();
-        
-        this.updateAllTiles(tile => {
-            // Generate an initial height for each tile by mashing together and convoluting a few polled simplex noise targets.
-            let noiseFrequencies = {
-                large: simplexNoise(1042, (tile.x * this.width) + tile.y),
-                medium: simplexNoise(512, (tile.x * this.width) + tile.y),
-                small: simplexNoise(256, (tile.x * this.width) + tile.y),
-            } 
-            
-            const combinedNoiseResult = (noiseFrequencies.small + noiseFrequencies.medium + noiseFrequencies.large) / (1 + 0.5 + 0.25);
-            const poweredNoiseResult = Math.pow(combinedNoiseResult, 2);
+        this.updateAllTiles(tile => this.populateInitialTileHeight(tile));
+    }
+    
+    /** Generate an initial height for each tile by mashing together and convoluting a few polled simplex noise targets. */
+    private populateInitialTileHeight(tile: Tile): Tile {
+        let noiseFrequencies = {
+            large: simplexNoise(1042, (tile.x * this.width) + tile.y),
+            medium: simplexNoise(512, (tile.x * this.width) + tile.y),
+            small: simplexNoise(256, (tile.x * this.width) + tile.y),
+        };
 
-            let elevationVariance = combinedNoiseResult > 0 ?
-                Math.floor(poweredNoiseResult * 2048) :
-                Math.floor(poweredNoiseResult * -2048);
+        const combinedNoiseResult = (noiseFrequencies.small + noiseFrequencies.medium + noiseFrequencies.large) / (1 + 0.5 + 0.25);
+        const poweredNoiseResult = Math.pow(combinedNoiseResult, 2);
 
-            tile.elevation = this.seaLevel + elevationVariance;
+        let elevationVariance = combinedNoiseResult > 0 ?
+            Math.floor(poweredNoiseResult * 2048) :
+            Math.floor(poweredNoiseResult * -2048);
 
-            // For this step, terrain type is solely based on 
-            if (tile.elevation < this.seaLevel) {
-                tile.terrainType = TerrainType.OCEAN;
-            } else {
-                tile.terrainType = TerrainType.GRASSLAND;
-            }
+        tile.elevation = this.seaLevel + elevationVariance;
 
-            return tile;
-        })
+        // For this step, terrain type is solely based on elevation relative to the sea level.
+        // FUTURE: This step will be moved to its own function as we add more steps to worldgen.
+        if (tile.elevation < this.seaLevel) {
+            tile.terrainType = TerrainType.OCEAN;
+        } else {
+            tile.terrainType = TerrainType.GRASSLAND;
+        }
+
+        return tile;
     }
 
     /* Map terrain types to texture keys */
