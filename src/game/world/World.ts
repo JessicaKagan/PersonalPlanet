@@ -5,7 +5,7 @@ import { TerrainType } from './TerrainType';
 import type { Tile } from './Tile';
 import { createNoise2D } from 'simplex-noise';
 
-export const DEFAULT_WORLD_SIZE = { x: 64, y: 64 };
+export const DEFAULT_WORLD_SIZE = { x: 128, y: 64 };
 /** 1.361 kilowatts per square meter */
 export const DEFAULT_SOLAR_CONSTANT = 1361;
 /** 32768 meters */
