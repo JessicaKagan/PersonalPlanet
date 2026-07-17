@@ -133,12 +133,13 @@ export class World {
     public populateWorld(): void {
         this.updateAllTiles(tile => this.populateInitialTileHeight(tile));
         this.updateAllTiles(tile => this.populateInitialTileTemperature(tile));
+        this.updateAllTiles(tile => this.populateInitialTileHumidity(tile));
     }
     
     /** Generate an initial height for each tile by mashing together and convoluting a few polled simplex noise targets. */
     private populateInitialTileHeight(tile: Tile): Tile {
         let noiseFrequencies = {
-            large: simplexNoise(1042, (tile.x * this.width) + tile.y),
+            large: simplexNoise(1024, (tile.x * this.width) + tile.y),
             medium: simplexNoise(512, (tile.x * this.width) + tile.y),
             small: simplexNoise(256, (tile.x * this.width) + tile.y),
         };
@@ -185,6 +186,24 @@ export class World {
         const temperatureReductionFromElevation = elevationAboveSeaLevel * (9.8 / 1000);
 
         tile.temperature = baseTemperature - temperatureReductionFromLatitude - temperatureReductionFromElevation;
+        return tile;
+    }
+
+    /** Generate an initial humidity for each tile. This uses a simplex noise map, similar to populateInitialTileHeight, but with less convolution.
+     * FUTURE: Figure out a way to infer humidity from the world, instead of simply using a random value.
+     */
+    private populateInitialTileHumidity(tile: Tile): Tile {
+        let noiseFrequencies = {
+            large: simplexNoise(1024, (tile.x * this.width) + tile.y),
+            medium: simplexNoise(512, (tile.x * this.width) + tile.y),
+            small: simplexNoise(256, (tile.x * this.width) + tile.y),
+        };
+        
+        // BUG: This can end up above 1 or below -1. What's causing this?
+        const combinedNoiseResult = (noiseFrequencies.small + noiseFrequencies.medium + noiseFrequencies.large) / (1 + 0.5 + 0.25);
+
+        tile.humidity = Math.floor(Math.abs(combinedNoiseResult) * 100);
+        
         return tile;
     }
 
