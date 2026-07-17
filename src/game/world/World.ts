@@ -148,6 +148,7 @@ export class World {
      */
     public populateWorld(): void {
         this.updateAllTiles(tile => this.populateInitialTileHeight(tile));
+        this.updateAllTiles(tile => this.populateInitialTileTemperature(tile));
     }
     
     /** Generate an initial height for each tile by mashing together and convoluting a few polled simplex noise targets. */
@@ -175,6 +176,31 @@ export class World {
             tile.terrainType = TerrainType.GRASSLAND;
         }
 
+        return tile;
+    }
+
+    /** Generate an initial temperature for each tile. As of PP-4-1, the tile temperature is a function of both distance from the equator
+     * and height above sea level, but there's a great deal of room to expand on this.
+     */
+    private populateInitialTileTemperature(tile: Tile): Tile {
+        // Start with a placeholder average temperature (50C).
+        // FUTURE: Replace this hardcoded value with something we can calculate based on the solar constant or similar.
+        const baseTemperature = 323;
+
+        /**
+         * For PP-4-1, our initial latitude -> temperature relation is to assume that the poles are 100 °C colder than the equator.
+         */
+        const equator = this.height / 2;
+        const distanceFromEquator = Math.abs(tile.y - equator);
+        const temperatureReductionFromLatitude = Math.sin(Math.PI * (distanceFromEquator / equator)) * 100;
+
+        /** 
+         * For PP-4-1, our initial elevation -> temperature relation is based on the the adiabatic lapse rate (9.8 °C per kilometer above sea level).
+         * */ 
+        const elevationAboveSeaLevel = tile.elevation >= this.seaLevel ? tile.elevation - this.seaLevel : 0;
+        const temperatureReductionFromElevation = elevationAboveSeaLevel * (9.8 / 1000);
+
+        tile.temperature = baseTemperature - temperatureReductionFromLatitude - temperatureReductionFromElevation;
         return tile;
     }
 
