@@ -22,28 +22,26 @@ const simplexNoise = createNoise2D();
 export class World {
     /** BASIC WORLD INFORMATION */
 
-    /** The width of the world in tiles */
-    private width: number;
+    /** The width of the world in tiles. */
+    public readonly width: number;
+
+    /** The height of the world in tiles. */
+    public readonly height: number;
     
-    /** The height of the world in tiles*/
-    private height: number;
+    /** CLIMATE INFORMATION */
+    
+    /** The amount of sunlight a World gets. The default value resembles the solar constant of Earth in watts per square meter.*/
+    public readonly insolation: number;
+    /** The average sea level of a World. Tiles with heights below this should be assigned TerrainType.OCEAN. */
+    public readonly seaLevel: number;
+    /** How quickly the world rotates. This is an arbitrary percentage. */
+    public readonly rotationSpeed: number;
     
     /** The 2D array of tiles that make up the world */
     private tiles: Tile[][];
 
-    /** CLIMATE INFORMATION */
-    
-    /** The amount of sunlight a World gets. The default value resembles the solar constant of Earth in watts per square meter.*/
-    private insolation: number;
-    /** The average sea level of a World. Tiles with heights below this should be assigned TerrainType.OCEAN. */
-    private seaLevel: number;
-    /** How quickly the world rotates. This is an arbitrary percentage. */
-    private rotationSpeed: number;
-    
     /**
      * Create a new, empty World object.
-     * @param width The width of the world in tiles
-     * @param height The height of the world in tiles
      */
     constructor(
         width: number,
@@ -76,20 +74,6 @@ export class World {
                 };
             }
         }
-    }
-    
-    /**
-     * Gets the width of the world
-     */
-    getWidth(): number {
-        return this.width;
-    }
-    
-    /**
-     * Gets the height of the world
-     */
-    getHeight(): number {
-        return this.height;
     }
     
     /**

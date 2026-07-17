@@ -170,8 +170,8 @@ export class Game extends Scene
         const tiles = this.world.getTiles();
         const tileSize = 64; // Each tile is 64x64 pixels
         
-        for (let x = 0; x < this.world.getWidth(); x++) {
-            for (let y = 0; y < this.world.getHeight(); y++) {
+        for (let x = 0; x < this.world.width; x++) {
+            for (let y = 0; y < this.world.height; y++) {
                 const tile = tiles[x][y];
                 if (tile) {
                     // Create a visual representation of the tile
