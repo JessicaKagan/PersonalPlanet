@@ -206,10 +206,34 @@ export class World {
     }
 
     public updateTileTerrain(tile: Tile): Tile {
+        // Ocean simulation is simple for now - just go by the current sea level and temperature!
         if (tile.elevation < this.seaLevel) {
             tile.terrainType = tile.temperature >= 273 ? TerrainType.OCEAN : TerrainType.ICE_CAP;
         } else {
-            tile.terrainType = TerrainType.GRASSLAND;
+            // FUTURE: We have a "freshwater" terrain type defined. This will likely be helpful for water above sea level, but it might be best to handle
+            // that seperately from the terrain type. This requires investigating.
+
+            // Terrain types are currently sorted first by temperature, and then by humidity.
+            if (tile.temperature < 273) {
+                tile.terrainType = TerrainType.POLAR;
+            } else if (tile.temperature >= 273 && tile.temperature < 283) { // 0-10°C
+                tile.terrainType = 
+                    tile.humidity > 50 ? TerrainType.TAIGA : 
+                    tile.humidity > 25 ? TerrainType.TUNDRA :
+                TerrainType.COLD_DESERT;
+            } else if (tile.temperature >= 283 && tile.temperature < 293) { // 10-20°C
+                tile.terrainType = 
+                    tile.humidity > 75 ? TerrainType.TEMPERATE_SWAMP : 
+                    tile.humidity > 50 ? TerrainType.TEMPERATE_FOREST: 
+                    tile.humidity > 25 ? TerrainType.GRASSLAND :
+                    TerrainType.STEPPE;
+            } else if (tile.temperature >= 293) { // >20°C
+                tile.terrainType = 
+                    tile.humidity > 75 ? TerrainType.TROPICAL_SWAMP : 
+                    tile.humidity > 50 ? TerrainType.TROPICAL_FOREST: 
+                    tile.humidity > 25 ? TerrainType.TROPICAL_GRASSLAND :
+                    TerrainType.HOT_DESERT;
+            }
         }
 
         return tile;

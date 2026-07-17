@@ -18,10 +18,15 @@ export enum TerrainType {
 
     /** Cold land terrains */
 
+    /** The land equivalent of an ice cap. The average monthly temperature never exceeds 0°C.  */
     POLAR = "Polar terrain", 
-    TUNDRA = "Tundra",
-    TAIGA = "Taiga",
+
+    /** The driest cold non-polar terrain. */
     COLD_DESERT = "Cold Desert",
+    /** Tundras vary a lot, but for now are treated as moderately dry cold terrain. */
+    TUNDRA = "Tundra",
+    /** Taigas (aka boreal forests) vary a lot too, but for now are treated as less dry cold terrain. */
+    TAIGA = "Taiga",
 
     /** Middling temperature land terrains */
 
