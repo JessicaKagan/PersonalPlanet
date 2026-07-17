@@ -131,9 +131,15 @@ export class World {
      * We'll also want to add a "load from save" method.
      */
     public populateWorld(): void {
+        // Tile data is derived from a mixture of randomized sources (noise) and formulas running on these values.
         this.updateAllTiles(tile => this.populateInitialTileHeight(tile));
-        this.updateAllTiles(tile => this.populateInitialTileTemperature(tile));
         this.updateAllTiles(tile => this.populateInitialTileHumidity(tile));
+        this.updateAllTiles(tile => this.populateInitialTileTemperature(tile));
+
+        // FUTURE: If we want to smooth out various aspects of world generation, we should do it here, in a second pass.
+
+        // After the tiles' climate metadata has been generated to our liking, we should have enough information to derive the tile's terrain.
+        this.updateAllTiles(tile => this.updateTileTerrain(tile));
     }
     
     /** Generate an initial height for each tile by mashing together and convoluting a few polled simplex noise targets. */
@@ -153,14 +159,6 @@ export class World {
 
         tile.elevation = this.seaLevel + elevationVariance;
 
-        // For this step, terrain type is solely based on elevation relative to the sea level.
-        // FUTURE: This step will be moved to its own function as we add more steps to worldgen.
-        if (tile.elevation < this.seaLevel) {
-            tile.terrainType = TerrainType.OCEAN;
-        } else {
-            tile.terrainType = TerrainType.GRASSLAND;
-        }
-
         return tile;
     }
 
@@ -177,7 +175,7 @@ export class World {
          */
         const equator = this.height / 2;
         const distanceFromEquator = Math.abs(tile.y - equator);
-        const temperatureReductionFromLatitude = Math.sin(Math.PI * (distanceFromEquator / equator)) * 100;
+        const temperatureReductionFromLatitude = Math.sin(Math.PI * (distanceFromEquator / this.height)) * 100;
 
         /** 
          * For PP-4-1, our initial elevation -> temperature relation is based on the the adiabatic lapse rate (9.8 °C per kilometer above sea level).
@@ -204,6 +202,16 @@ export class World {
 
         tile.humidity = Math.floor(Math.abs(combinedNoiseResult) * 100);
         
+        return tile;
+    }
+
+    public updateTileTerrain(tile: Tile): Tile {
+        if (tile.elevation < this.seaLevel) {
+            tile.terrainType = tile.temperature >= 273 ? TerrainType.OCEAN : TerrainType.ICE_CAP;
+        } else {
+            tile.terrainType = TerrainType.GRASSLAND;
+        }
+
         return tile;
     }
 
