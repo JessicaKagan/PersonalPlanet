@@ -51,12 +51,22 @@
         customCSSStyles = ''; // FUTURE: If we have more ways of switching to detailed mode, we may want to move this cleanup step.
     });
 
-    const closeDialog = () => {
+    const closeDialog = (): void => {
         // Clean up unneeded information before closing the dialog.
         currentQueryInfo = undefined;
 
         const tileInformationDialog = document.querySelector('#tile-information-dialog') as HTMLDialogElement;
         tileInformationDialog?.close();
+    }
+
+    const getTileHeight = (): string => {
+        const scene = phaserRef.scene as Game;
+
+        if (!scene || !scene.world || currentQueryInfo?.tile?.elevation == undefined) {
+            return '';
+        }
+
+        return `${currentQueryInfo?.tile?.elevation - scene.world.seaLevel}`;
     }
 </script>
 
@@ -74,11 +84,18 @@
             <h3>Tile Details</h3>
             <h4>{currentQueryInfo.tile.terrainType}</h4>
             <p>({currentQueryInfo.tile.x}, {currentQueryInfo.tile.y})</p>
+            <!-- It's more verbose to have separate templates for each dialog mode,
+                but it's much easier to tell what should and shouldn't be in each mode this way. -->
+            {#if dialogMode === TileInformationDialogMode.HOVER}
+                <p>Temperature: {(currentQueryInfo.tile.temperature - 273).toFixed(2)}°C</p>
+                <p>Elevation: {getTileHeight()} meters</p>
+            {/if}
+
             {#if dialogMode === TileInformationDialogMode.DETAILED}
-                <p>Temperature: {currentQueryInfo.tile.temperature}</p>
+                <p>Temperature: {(currentQueryInfo.tile.temperature - 273).toFixed(2)}°C</p>
                 <p>Albedo: {currentQueryInfo.tile.albedo}%</p>
                 <p>Humidity: {currentQueryInfo.tile.humidity}%</p>
-                <p>Elevation: {currentQueryInfo.tile.elevation} meters</p>
+                <p>Elevation: {getTileHeight()} meters</p>
             {/if}
         </section>
     {/if}
@@ -88,7 +105,7 @@
     :global {
         #tile-information-dialog {
             width: 128px;
-            height: 160px;
+            height: 270px;
             margin: unset; // As part of PP-3-2, this ensures that the modal follows the user's cursor in hover mode.
             padding: 0;
 
@@ -124,6 +141,10 @@
             // Repeated sections, in case we need an arbitrary number of them. Not to be confused with a bespoke section like the detailed controls.
             .dialog-section {
                 margin: 8px;
+
+                p {
+                    margin: 8px 0;
+                }
             }
 
             &.hover {
