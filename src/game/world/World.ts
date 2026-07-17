@@ -166,24 +166,24 @@ export class World {
      * and height above sea level, but there's a great deal of room to expand on this.
      */
     private populateInitialTileTemperature(tile: Tile): Tile {
-        // Start with a placeholder average temperature (50C).
+        // Start with a placeholder average temperature (40°C).
         // FUTURE: Replace this hardcoded value with something we can calculate based on the solar constant or similar.
-        const baseTemperature = 323;
+        const baseTemperature = 313;
 
-        /**
-         * For PP-4-1, our initial latitude -> temperature relation is to assume that the poles are 100 °C colder than the equator.
-         */
+        /** For PP-4-1, our initial latitude -> temperature relation is to arbitrarily assume that the poles are about 60 °C colder than the equator. */
         const equator = this.height / 2;
         const distanceFromEquator = Math.abs(tile.y - equator);
-        const temperatureReductionFromLatitude = Math.sin(Math.PI * (distanceFromEquator / this.height)) * 100;
+        const temperatureReductionFactor = Math.sin(Math.PI * (distanceFromEquator / this.height));
+        const temperatureReductionFromLatitude = Math.pow(temperatureReductionFactor, 2) * 60;
 
-        /** 
-         * For PP-4-1, our initial elevation -> temperature relation is based on the the adiabatic lapse rate (9.8 °C per kilometer above sea level).
-         * */ 
+        /** For PP-4-1, our initial elevation -> temperature relation is based on the the adiabatic lapse rate (9.8 °C per kilometer above sea level). */ 
         const elevationAboveSeaLevel = tile.elevation >= this.seaLevel ? tile.elevation - this.seaLevel : 0;
         const temperatureReductionFromElevation = elevationAboveSeaLevel * (9.8 / 1000);
 
-        tile.temperature = baseTemperature - temperatureReductionFromLatitude - temperatureReductionFromElevation;
+        /** For PP-4-1, add a small random nudge to the temperature for more interesting ice cap patterns. */
+        const randomTemperatureDelta = simplexNoise(1024, (tile.x * this.width) + tile.y) * 5;
+
+        tile.temperature = baseTemperature - temperatureReductionFromLatitude - temperatureReductionFromElevation + randomTemperatureDelta;
         return tile;
     }
 
@@ -221,13 +221,13 @@ export class World {
                     tile.humidity > 50 ? TerrainType.TAIGA : 
                     tile.humidity > 25 ? TerrainType.TUNDRA :
                 TerrainType.COLD_DESERT;
-            } else if (tile.temperature >= 283 && tile.temperature < 293) { // 10-20°C
+            } else if (tile.temperature >= 283 && tile.temperature < 303) { // 10-30°C
                 tile.terrainType = 
                     tile.humidity > 75 ? TerrainType.TEMPERATE_SWAMP : 
                     tile.humidity > 50 ? TerrainType.TEMPERATE_FOREST: 
                     tile.humidity > 25 ? TerrainType.GRASSLAND :
                     TerrainType.STEPPE;
-            } else if (tile.temperature >= 293) { // >20°C
+            } else if (tile.temperature >= 303) { // >30°C
                 tile.terrainType = 
                     tile.humidity > 75 ? TerrainType.TROPICAL_SWAMP : 
                     tile.humidity > 50 ? TerrainType.TROPICAL_FOREST: 
