@@ -179,11 +179,11 @@ export class World {
         // FUTURE: Replace this hardcoded value with something we can calculate based on the solar constant or similar.
         const baseTemperature = 313;
 
-        /** For PP-4-1, our initial latitude -> temperature relation is to arbitrarily assume that the poles are about 60 °C colder than the equator. */
+        /** For PP-4-1, our initial latitude -> temperature relation is to arbitrarily assume that the poles are about 50 °C colder than the equator. */
         const equator = this.height / 2;
         const distanceFromEquator = Math.abs(tile.y - equator);
         const temperatureReductionFactor = Math.sin(Math.PI * (distanceFromEquator / this.height));
-        const temperatureReductionFromLatitude = Math.pow(temperatureReductionFactor, 2) * 60;
+        const temperatureReductionFromLatitude = Math.pow(temperatureReductionFactor, 2) * 50;
 
         /** For PP-4-1, our initial elevation -> temperature relation is based on the the adiabatic lapse rate (9.8 °C per kilometer above sea level). */ 
         const elevationAboveSeaLevel = tile.elevation >= this.seaLevel ? tile.elevation - this.seaLevel : 0;
