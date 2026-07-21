@@ -1,6 +1,7 @@
 /**
  * Represents the game world, which is a multidimensional array of tiles.
  */
+import { index, larger, matrix, mean, range, smaller } from 'mathjs';
 import { TerrainType } from './TerrainType';
 import type { Tile } from './Tile';
 import { createNoise2D } from 'simplex-noise';
@@ -137,7 +138,8 @@ export class World {
         this.updateAllTiles(tile => this.populateInitialTileHumidity(tile));
         this.updateAllTiles(tile => this.populateInitialTileTemperature(tile));
 
-        // FUTURE: If we want to smooth out various aspects of world generation, we should do it here, in a second pass.
+        // Run some post-processing to make the world less jagged looking. This significantly affects how pleasing the world looks.
+        this.erodeWorld();
 
         // After the tiles' climate metadata has been generated to our liking, we should have enough information to derive the tile's terrain.
         this.updateAllTiles(tile => this.updateTileTerrain(tile));
@@ -238,6 +240,36 @@ export class World {
         }
 
         return tile;
+    }
+
+    /** Given the elevations of each tile in the user's World, return a smoothed out version
+     * using a box blur to average each tile's height with its nearby neighbors.
+     * The box blur is potentially handy enough for other tile properties that we should really split it off into a utility function somewhere.
+     * @param blurFactor The number of tiles to blur in each direction
+     */
+    public erodeWorld(blurFactor: number = 3): void {
+        const elevationMap = matrix(this.tiles.map(row => row.map(tile => tile.elevation)));
+
+        // When called this way, matrix.forEach() gives us the value of each element in the matrix, as well as its index (as an array with X and Y coordinates).
+        elevationMap.forEach((value: number, tileIndex: number[]) => {
+            // First, get the blurrable radius of each tile. This is usually equivalent to a square where each side's length is blurFactor * 2,
+            // but with Tile indices outside the World filtered out. 
+            const x = tileIndex[0], y = tileIndex[1];
+            const rangesForBlurring = {
+                x: range(x - blurFactor, x + blurFactor).toArray().filter(x => {
+                    return larger(x, 0) && smaller(x, this.width);
+                }),
+                y: range(y - blurFactor, y + blurFactor).toArray().filter(y => {
+                    return larger(y, 0) && smaller(y, this.height);
+                })
+            };
+
+            // Then, average together all the values in the tile's blurrable radius.
+            const heightsForBlurring = elevationMap.subset(index(rangesForBlurring.x, rangesForBlurring.y));
+            const averageHeight = mean(heightsForBlurring);
+
+            this.tiles[x][y].elevation = Number(averageHeight);
+        });
     }
 
     /* Map terrain types to texture keys */
