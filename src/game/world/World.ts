@@ -114,13 +114,14 @@ export class World {
     /**
      * Updates all tiles in the world with a provided callback function. This is helpful when you're running either world generation
      * or world simulation logic and need to update the status of the entire world.
+     * FUTURE: This currently only runs a single function on each tile. We should update this to take an array of functions instead.
      * @warning This function was generated from a Qwen + Zoo Code session.
-     * @param updateFn The function to apply to each tile
+     * @param callbackFunction The function to apply to each tile
      */
-    public updateAllTiles(updateFn: (tile: Tile) => Tile): void {
+    public updateAllTiles(callbackFunction: (tile: Tile) => Tile): void {
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
-                this.tiles[x][y] = updateFn(this.tiles[x][y]);
+                this.tiles[x][y] = callbackFunction(this.tiles[x][y]);
             }
         }
     }
