@@ -145,7 +145,9 @@ export class World {
         this.updateAllTiles(tile => this.updateTileTerrain(tile));
     }
     
-    /** Generate an initial height for each tile by mashing together and convoluting a few polled simplex noise targets. */
+    /** Generate an initial height for each tile.
+     *  As of 7/21/2026, we start with a random value derived from simplex noise, and then adjust based on latitude.
+     */
     private populateInitialTileHeight(tile: Tile): Tile {
         let noiseFrequencies = {
             large: simplexNoise(1024, (tile.x * this.width) + tile.y),
@@ -156,11 +158,15 @@ export class World {
         const combinedNoiseResult = (noiseFrequencies.small + noiseFrequencies.medium + noiseFrequencies.large) / (1 + 0.5 + 0.25);
         const poweredNoiseResult = Math.pow(combinedNoiseResult, 2);
 
-        let elevationVariance = combinedNoiseResult > 0 ?
+        // I like the look of worldgen more if tiles are slightly higher towards the equator, and lower towards the poles.
+        let randomElevationVariance = combinedNoiseResult > 0 ?
             Math.floor(poweredNoiseResult * 2048) :
             Math.floor(poweredNoiseResult * -2048);
+        const equator = this.height / 2;
+        const distanceFromEquator = Math.abs(tile.y - equator);
+        let latitudeVariance = Math.floor((Math.sin(Math.PI * (distanceFromEquator / this.height)) * 128) - 32);
 
-        tile.elevation = this.seaLevel + elevationVariance;
+        tile.elevation = this.seaLevel + randomElevationVariance - latitudeVariance;
 
         return tile;
     }
