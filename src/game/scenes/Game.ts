@@ -10,7 +10,8 @@ import {
     MAXIMUM_ZOOM_FACTOR,
     WorldControlsTools,
     CustomPhaserEvents,
-    type QueryInfo
+    type QueryInfo,
+    DEFAULT_SIMULATION_TICKS_PER_CLIMATE_UPDATE
 } from '../defines';
 
 export class Game extends Scene
@@ -218,6 +219,9 @@ export class Game extends Scene
     }
 
     // TODO: Figure out if this and updateTileVisual should be moved to an "Update" file. Perhaps its own folder, too?
+    /** Run simulation update tasks at preset intervals.
+     * @returns A numeric ID for tracking the recursive timeout loop used to run simulation ticks.
+     */
     private updateSimulation(): number
     {
         // We use a recursive timeout for to make sure every simulation tick is complete before moving onto the next, in case of slowdown.
@@ -225,6 +229,12 @@ export class Game extends Scene
         return setTimeout(() => {
             this.timeOfLastSimulationUpdate = Date.now();
             this.simulationTicksElapsed += 1;
+
+            if (this.simulationTicksElapsed % DEFAULT_SIMULATION_TICKS_PER_CLIMATE_UPDATE === 0) {
+                this.world.updateClimate();
+                this.world.updateAllTiles(tile => this.world.updateTileTerrain(tile));
+            }
+
             this.updateSimulation();
         }, this.updateInterval);
         // Every time Phaser produces a new frame, check if the simulation needs an update.
