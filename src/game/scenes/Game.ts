@@ -50,12 +50,13 @@ export class Game extends Scene
     }
 
     create (): void {
+        // First, generate, then draw the player's World.
         // FUTURE: We should eventually allow users to generate a world with a custom size.
         this.world = new World(DEFAULT_WORLD_SIZE.x, DEFAULT_WORLD_SIZE.y);
-        
-        // Fill the world with some test tiles
         this.world.populateWorld();
+        this.renderInitialWorld();
         
+        // Then, set up the Game scene's controls.
         this.camera = this.cameras.main;
         this.camera.setBackgroundColor(0x000000);
         
@@ -63,12 +64,10 @@ export class Game extends Scene
         // and make absolutely certain that users can view the entire world. I'd like to eventually make the world wrap horizontally,
         // so any implementation before that would need to be revised afterwards.
         this.camera.setBounds(0, 0, DEFAULT_WORLD_SIZE.x * DEFAULT_TILE_SIZE, DEFAULT_WORLD_SIZE.y * DEFAULT_TILE_SIZE);
-
-        // Render the initial state of the world
-        this.renderInitialWorld();
-
         this.addControls();
 
+        // Finally, begin running the simulation, and tell other components the current scene is ready.
+        this.updateSimulation();
         EventBus.emit('current-scene-ready', this);
     }
 
@@ -161,6 +160,7 @@ export class Game extends Scene
         }
     }
 
+    /** Create our initial graphical representation of the user's World. */
     renderInitialWorld(): void {
         // Clear existing tiles
         this.tileMap.forEach(tile => tile.destroy());
