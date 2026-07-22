@@ -19,8 +19,16 @@ export class Game extends Scene
     world: World;
     tileMap: Phaser.GameObjects.TileSprite[] = [];
 
-    public updateInterval = 1000 / DEFAULT_SIMULATION_TICKS_PER_SECOND; // Update the simulation every 100ms by default.
-    public timeSinceLastUpdate = 0; // Keep track of how much time has passed since the last interval.
+    public updateInterval = 1000 / DEFAULT_SIMULATION_TICKS_PER_SECOND; // Update the simulation every 20ms by default.
+
+    // Keep track of times and deltas for Phaser scene and simulation updates.
+    public timeOfLastSceneUpdate = 0;
+    public timeSinceLastSceneUpdate = 0;
+    public timeOfLastSimulationUpdate = 0;
+    public simulationTicksElapsed = 0;
+
+    // FUTURE: Use this to track and potentially stop the update loop (for instance, after pausing is implemented).
+    private updateSimulationTimeoutHandler: number | undefined;
     
     // FUTURE: Phaser.Input.Pointer contains a "buttons" property which can be used to determine which buttons a user is holding.
     // We may want to use helper variables to make the code more readable, but either way, these should be revisited as we build out global event handlers.
@@ -49,7 +57,7 @@ export class Game extends Scene
         super('Game');
     }
 
-    create (): void {
+    create(): void {
         // First, generate, then draw the player's World.
         // FUTURE: We should eventually allow users to generate a world with a custom size.
         this.world = new World(DEFAULT_WORLD_SIZE.x, DEFAULT_WORLD_SIZE.y);
@@ -67,7 +75,7 @@ export class Game extends Scene
         this.addControls();
 
         // Finally, begin running the simulation, and tell other components the current scene is ready.
-        this.updateSimulation();
+        this.updateSimulationTimeoutHandler = this.updateSimulation();
         EventBus.emit('current-scene-ready', this);
     }
 
@@ -200,7 +208,25 @@ export class Game extends Scene
         }
     }
     
+    /** An event handler for the Game Scene's update event in Phaser.
+     * Game logic that needs to happen per frame (as opposed to per simulation tick) should live here. */
     update (time: number, delta: number): void {
+        // For now, just make a note of when this event last fired.
+        // FUTURE: This would be helpful for implementing an FPS counter at some point!
+        this.timeOfLastSceneUpdate = time;
+        this.timeSinceLastSceneUpdate = delta;
+    }
+
+    // TODO: Figure out if this and updateTileVisual should be moved to an "Update" file. Perhaps its own folder, too?
+    private updateSimulation(): number
+    {
+        // We use a recursive timeout for to make sure every simulation tick is complete before moving onto the next, in case of slowdown.
+        // setInterval allows us to set a maximum speed, but doesn't properly account for this.
+        return setTimeout(() => {
+            this.timeOfLastSimulationUpdate = Date.now();
+            this.simulationTicksElapsed += 1;
+            this.updateSimulation();
+        }, this.updateInterval);
         // Every time Phaser produces a new frame, check if the simulation needs an update.
         // FUTURE: We most likely want this to work the other way around - i.e, the simulation itself should update consistently (as possible),
         // and the renderer should pick up any changes to the in-game world that have happened since the last frame.
