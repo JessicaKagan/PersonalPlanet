@@ -1,0 +1,12 @@
+In the previous climate handling ticket, we implemented an MVP for procedurally generated terrain (random noise, filters, etc), with a variety of properties that can be used to set the initial terrain of a tile. The next step for climate simulation is... actually simulating a climate.
+
+* The simplest useful climate model we can implement with the layers we have is as follows:
+    * Every X amount of simulation ticks, the **World** receives some amount of insolation. Depending on the albedo of a **Tile**, part of the insolation is absorbed by terrain and warms it up, and part of it is reflected back into space. After that, tile temperatures drift slightly towards thermal equilibrium with one another. Finally, the world as a whole radiates some heat off into space.
+    * If a **Tile**'s average temperature changes enough as a result of the insolation, it should result in a change to the **Tile**'s **TerrainType**. This should also result in an albedo change.
+    * This behavior is directly inspired by the Gaia hypothesis and Daisyworld model (see https://en.wikipedia.org/wiki/Daisyworld) for a more in depth description. Exact details are going to depend on what sort of gameplay I work towards, but just like its _SimEarth_ forebearer, _Personal Planet_ is the kind of game that cares deeply about emergent behavior and feedback loops in simulations.
+
+For this climate MVP, we need to do the following:
+* Ensure that the time handling in our game loop is in a good state. We need to make sure that our separation of simulation and rendering works well with Phaser's update events. Running nominal simulation updates in response to Phaser events was sufficient for the earliest rendering/UX buildout, but at this point, we need to make sure these are fully and properly separated.
+* Add support for running our climate evaluation task every X simulation ticks. As a general rule, we don't want to run every task on every tick, so we need to have game loop support for periodic simulation tasks.
+* Implement the actual climate evaluation, as per the simplified model earlier.
+    * This should be where we take the core "blur arbitrary tile properties" logic in **World.erodeWorld()** and split that off into a reusable function, since that'll come in handy for the thermal equilibrium step. We should add support for performing a weighted average here.

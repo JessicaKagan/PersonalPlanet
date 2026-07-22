@@ -10,3 +10,5 @@ This (and future PP-4 subtickets) is part of a series of tickets to move us away
 * For testing purposes, we may want to adjust the temperature and height of tiles regularly in the simulation loop, but this could also be spun off into a separate ticket.
 
 Update (7/14/2026): When it comes to world generation and simulation, I expect to implement a large number of functions where we need to account for not only the current state of a **Tile**, but also some number of **Tiles** around it (essentially, effects propagating throughout the player's **World**). It could save us a lot of labor (and probably help with code intelligibility) to use a pre-existing library for math, and in particular matrix/multi-dimensional array work. This needs research. Something like https://www.npmjs.com/package/mathjs could do the trick.
+
+Update (7/22/2026): Dynamic updates to temperature and climate simulations have been spun off into PP-4-2.
