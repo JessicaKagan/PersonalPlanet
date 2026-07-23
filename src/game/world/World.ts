@@ -143,6 +143,7 @@ export class World {
 
         // After the tiles' climate metadata has been generated to our liking, we should have enough information to derive the tile's terrain.
         this.updateAllTiles(tile => this.updateTileTerrain(tile));
+        this.updateAllTiles(tile => this.updateTileAlbedo(tile));
     }
     
     /** Generate an initial height for each tile.
@@ -263,6 +264,46 @@ export class World {
             }
         }
 
+        return tile;
+    }
+
+    /** Update the albedo of a tile based on its terrain type.
+     * FUTURE: This method might change as we add additional layers to the simulation.
+     */
+    public updateTileAlbedo(tile: Tile): Tile {
+        switch (tile.terrainType) {
+            case TerrainType.ICE_CAP:
+            case TerrainType.POLAR:
+                tile.albedo = 60;
+                break;
+            case TerrainType.COLD_DESERT:
+            case TerrainType.HOT_DESERT:
+            case TerrainType.TUNDRA:
+                tile.albedo = 40;
+                break;
+            case TerrainType.STEPPE:
+            case TerrainType.GRASSLAND:
+            case TerrainType.TROPICAL_GRASSLAND:
+                tile.albedo = 25;
+                break;
+            case TerrainType.TEMPERATE_FOREST:
+            case TerrainType.TROPICAL_FOREST:
+            case TerrainType.TEMPERATE_SWAMP:
+            case TerrainType.TROPICAL_SWAMP:
+                tile.albedo = 18;
+                break;
+            case TerrainType.TAIGA:
+                tile.albedo = 15;
+                break;
+            case TerrainType.OCEAN:
+            case TerrainType.FRESHWATER:
+                tile.albedo = 6;
+                break;
+            case TerrainType.EMPTY:
+            default:
+                tile.albedo = 0;
+                break;
+        }
         return tile;
     }
 
