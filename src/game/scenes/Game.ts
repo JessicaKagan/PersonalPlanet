@@ -1,6 +1,5 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
-import { TerrainType } from '../world/TerrainType';
 import { World, DEFAULT_WORLD_SIZE } from '../world/World';
 import { DEFAULT_TILE_SIZE, type Tile } from '../world/Tile';
 import { 
@@ -13,6 +12,8 @@ import {
     type QueryInfo,
     DEFAULT_SIMULATION_TICKS_PER_CLIMATE_UPDATE
 } from '../defines';
+
+import * as RenderingService from '../services/rendering';
 
 export class Game extends Scene
 {
@@ -171,19 +172,20 @@ export class Game extends Scene
         }
     }
 
-    /** Create our initial graphical representation of the user's World. */
+    /** Create our initial graphical representation of the user's World.
+     * FUTURE: Phaser's "game object factory" appears to be tightly coupled to scenes. I want to move this method to the RenderingService,
+     * but we'd need to figure out a way to account for this coupling first. For now, this has to live here.
+     */
     renderInitialWorld(): void {
         // Clear existing tiles
         this.tileSpriteMap.forEach(tile => tile.destroy());
         this.tileSpriteMap = [];
-        
-        // Render each tile in the world
-        const tiles = this.world.getTiles();
+
         const tileSize = 64; // Each tile is 64x64 pixels
         
         for (let x = 0; x < this.world.width; x++) {
             for (let y = 0; y < this.world.height; y++) {
-                const tile = tiles[x][y];
+                const tile = this.world.getTile(x, y);
                 if (tile) {
                     // Create a visual representation of the tile
                     const tileSprite = this.add.tileSprite(
@@ -191,7 +193,7 @@ export class Game extends Scene
                         y * tileSize,
                         tileSize,
                         tileSize,
-                        this.world.getTileTextureKey(tile.terrainType)
+                        RenderingService.getTileTextureKey(tile.terrainType)
                     );
                     
                     // Set the sprite to be at the correct position in world space.
@@ -240,26 +242,11 @@ export class Game extends Scene
             // FUTURE: This could be computationally expensive.
             // Is there a way that we can start tracking which tiles in a world need a visual update and only updating those?
             for (const tileSprite of this.tileSpriteMap) {
-                this.updateTileVisual(tileSprite);
+                RenderingService.updateTileVisual(this.world, tileSprite);
             }
 
             this.updateSimulation();
         }, this.updateInterval);
-    }
-
-    /** Update the visual representation of a tile in the world.
-     * As of PP-4-2, this currently only updates tile textures.
-     * @param tileSprite A Phaser tileSprite, which crucially contains the custom data we added in renderInitialWorld().
-     */
-    private updateTileVisual(tileSprite: Phaser.GameObjects.TileSprite): void {
-        const tile = this.world.getTile(tileSprite.getData('worldX'), tileSprite.getData('worldY'));
-
-        if (!tile) {
-            return;
-        }
-
-        // The tileSprite is passed by reference, so we can update the contents of tileSpriteMap without having to mess with array indices et al.
-        tileSprite.setTexture(this.world.getTileTextureKey(tile.terrainType));
     }
 
     changeScene ()
