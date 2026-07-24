@@ -1,11 +1,12 @@
 /**
  * Represents the game world, which is a multidimensional array of tiles.
  */
-import { index, larger, matrix, mean, range, smaller } from 'mathjs';
+import { matrix, mean } from 'mathjs';
 import { TerrainType } from './TerrainType';
 import type { Tile } from './Tile';
 import { createNoise2D } from 'simplex-noise';
 import { SAFE_AVERAGE_TEMPERATURE, WATER_FREEZING_TEMPERATURE } from '../defines';
+import * as MathService from '../services/math';
 
 export const DEFAULT_WORLD_SIZE = { x: 128, y: 64 };
 /** 1.361 kilowatts per square meter */
@@ -346,33 +347,14 @@ export class World {
         return tile;
     }
 
-    /** Given the elevations of each tile in the user's World, return a smoothed out version
-     * using a box blur to average each tile's height with its nearby neighbors.
-     * The box blur is potentially handy enough for other tile properties that we should really split it off into a utility function somewhere.
+    /** Smooth out the height variations in the player's world using a box blur.
      * @param blurFactor The number of tiles to blur in each direction
      */
     public erodeWorld(blurFactor: number = 3): void {
-        const elevationMap = matrix(this.tiles.map(row => row.map(tile => tile.elevation)));
+        const blurredElevations = MathService.boxBlur(matrix(this.tiles.map(row => row.map(tile => tile.elevation))), blurFactor);
 
-        // When called this way, matrix.forEach() gives us the value of each element in the matrix, as well as its index (as an array with X and Y coordinates).
-        elevationMap.forEach((value: number, tileIndex: number[]) => {
-            // First, get the blurrable radius of each tile. This is usually equivalent to a square where each side's length is blurFactor * 2,
-            // but with Tile indices outside the World filtered out. 
-            const x = tileIndex[0], y = tileIndex[1];
-            const rangesForBlurring = {
-                x: range(x - blurFactor, x + blurFactor).toArray().filter(x => {
-                    return larger(x, 0) && smaller(x, this.width);
-                }),
-                y: range(y - blurFactor, y + blurFactor).toArray().filter(y => {
-                    return larger(y, 0) && smaller(y, this.height);
-                })
-            };
-
-            // Then, average together all the values in the tile's blurrable radius.
-            const heightsForBlurring = elevationMap.subset(index(rangesForBlurring.x, rangesForBlurring.y));
-            const averageHeight = mean(heightsForBlurring);
-
-            this.tiles[x][y].elevation = Number(averageHeight);
-        });
+        blurredElevations.forEach((value: number, tileIndex: number[]) => {
+            this.tiles[tileIndex[0]][tileIndex[1]].elevation = Number(value);
+        })
     }
 }
