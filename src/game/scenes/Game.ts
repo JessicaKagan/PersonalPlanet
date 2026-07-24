@@ -59,7 +59,20 @@ export class Game extends Scene
     constructor ()
     {
         super('Game');
+
+        // Vite hotloads are helpful for UX work, but can mess with the simulation loop.
+        // We should clear any existing updateSimulation instances in this case.
+        const hotContext = (import.meta as any).hot;
+        if (hotContext) {
+            hotContext.on("vite:beforeUpdate", () => {
+                if (this.updateSimulationTimeoutHandler !== undefined) {
+                    clearTimeout(this.updateSimulationTimeoutHandler);
+                    console.log('cleared timeout');
+                }
+            });
+        }
     }
+
 
     create(): void {
         // First, generate, then draw the player's World.
@@ -246,7 +259,7 @@ export class Game extends Scene
                 RenderingService.updateTileVisual(this.world, tileSprite);
             }
 
-            this.updateSimulation();
+            this.updateSimulationTimeoutHandler = this.updateSimulation();
         }, this.updateInterval);
     }
 
