@@ -12,6 +12,10 @@ export const MINIMUM_ZOOM_FACTOR = 1;
 export const MAXIMUM_ZOOM_FACTOR = 1 / 16;
 export const DEFAULT_ZOOM_TICK = Math.sqrt(2); // Using a number that "cleanly" multiplies into 2 allows the user finer zooming, while keeping the values predictable.
 
+export const WATER_FREEZING_TEMPERATURE = 273;
+export const WATER_BOILING_TEMPERATURE = 373;
+export const SAFE_AVERAGE_TEMPERATURE = 288;
+
 /** These enums are used by components in the UX layer. */
 export enum WorldControlsTools {
     None, Query, Draw

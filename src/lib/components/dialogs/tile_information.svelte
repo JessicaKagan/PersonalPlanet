@@ -3,7 +3,7 @@
 
     import type { TPhaserRef } from "../../../PhaserGame.svelte";
     import type { Game } from "../../../game/scenes/Game";
-    import { CustomPhaserEvents, TileInformationDialogMode, WorldControlsTools, type QueryInfo } from "../../../game/defines";
+    import { CustomPhaserEvents, TileInformationDialogMode, WATER_FREEZING_TEMPERATURE, WorldControlsTools, type QueryInfo } from "../../../game/defines";
     import { EventBus } from "../../../game/EventBus";
 
     interface TileInformationProps {
@@ -66,7 +66,7 @@
             return '';
         }
 
-        return `${currentQueryInfo?.tile?.elevation - scene.world.seaLevel}`;
+        return `${(currentQueryInfo?.tile?.elevation - scene.world.seaLevel).toFixed(2)}`;
     }
 </script>
 
@@ -87,12 +87,12 @@
             <!-- It's more verbose to have separate templates for each dialog mode,
                 but it's much easier to tell what should and shouldn't be in each mode this way. -->
             {#if dialogMode === TileInformationDialogMode.HOVER}
-                <p>Temperature: {(currentQueryInfo.tile.temperature - 273).toFixed(2)}°C</p>
+                <p>Temperature: {(currentQueryInfo.tile.temperature - WATER_FREEZING_TEMPERATURE).toFixed(2)}°C</p>
                 <p>Elevation: {getTileHeight()} meters</p>
             {/if}
 
             {#if dialogMode === TileInformationDialogMode.DETAILED}
-                <p>Temperature: {(currentQueryInfo.tile.temperature - 273).toFixed(2)}°C</p>
+                <p>Temperature: {(currentQueryInfo.tile.temperature - WATER_FREEZING_TEMPERATURE).toFixed(2)}°C</p>
                 <p>Albedo: {currentQueryInfo.tile.albedo}%</p>
                 <p>Humidity: {currentQueryInfo.tile.humidity}%</p>
                 <p>Elevation: {getTileHeight()} meters</p>

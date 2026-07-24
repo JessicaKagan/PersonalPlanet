@@ -5,6 +5,7 @@ import { index, larger, matrix, mean, range, smaller } from 'mathjs';
 import { TerrainType } from './TerrainType';
 import type { Tile } from './Tile';
 import { createNoise2D } from 'simplex-noise';
+import { SAFE_AVERAGE_TEMPERATURE, WATER_FREEZING_TEMPERATURE } from '../defines';
 
 export const DEFAULT_WORLD_SIZE = { x: 128, y: 64 };
 /** 1.361 kilowatts per square meter */
@@ -15,6 +16,8 @@ export const DEFAULT_MAXIMUM_ALTITUDE = Math.pow(2, 15);
 export const DEFAULT_SEA_LEVEL = Math.pow(2, 14);
 /** No inherent meaning, because this is a relative number. */
 export const DEFAULT_ROTATION_SPEED = 100;
+/** The percentage of World heat that radiates from the surface, through the World's atmosphere and into space. */
+export const DEFAULT_SURFACE_THERMAL_RADIATION = 15;
 
 // FUTURE: Investigate if there's any reason to have separate noise functions across components in Personal Planet.
 // If not, we should move this somewhere more central.
@@ -28,6 +31,9 @@ export class World {
 
     /** The height of the world in tiles. */
     public readonly height: number;
+
+    /** The middle latitude of the world, derived from its height. */
+    public readonly equator: number;
     
     /** CLIMATE INFORMATION */
     
@@ -56,6 +62,8 @@ export class World {
         this.insolation = insolation;
         this.seaLevel = seaLevel;
         this.rotationSpeed = rotationSpeed;
+
+        this.equator = this.height / 2;
 
         this.tiles = [];
         
@@ -111,6 +119,10 @@ export class World {
     getTiles(): Tile[][] {
         return this.tiles;
     }
+
+    public getDistanceFromEquator(tile: Tile) {
+        return Math.abs(tile.y - this.equator);
+    }
     
     /**
      * Updates all tiles in the world with a provided callback function. This is helpful when you're running either world generation
@@ -163,9 +175,7 @@ export class World {
         let randomElevationVariance = combinedNoiseResult > 0 ?
             Math.floor(poweredNoiseResult * 2048) :
             Math.floor(poweredNoiseResult * -2048);
-        const equator = this.height / 2;
-        const distanceFromEquator = Math.abs(tile.y - equator);
-        let latitudeVariance = Math.floor((Math.sin(Math.PI * (distanceFromEquator / this.height)) * 128) - 32);
+        let latitudeVariance = Math.floor((Math.sin(Math.PI * (this.getDistanceFromEquator(tile) / this.height)) * 128) - 32);
 
         tile.elevation = this.seaLevel + randomElevationVariance - latitudeVariance;
 
@@ -181,9 +191,7 @@ export class World {
         const baseTemperature = 313;
 
         /** For PP-4-1, our initial latitude -> temperature relation is to arbitrarily assume that the poles are about 50 °C colder than the equator. */
-        const equator = this.height / 2;
-        const distanceFromEquator = Math.abs(tile.y - equator);
-        const temperatureReductionFactor = Math.sin(Math.PI * (distanceFromEquator / this.height));
+        const temperatureReductionFactor = Math.sin(Math.PI * (this.getDistanceFromEquator(tile) / this.height));
         const temperatureReductionFromLatitude = Math.pow(temperatureReductionFactor, 2) * 50;
 
         /** For PP-4-1, our initial elevation -> temperature relation is based on the the adiabatic lapse rate (9.8 °C per kilometer above sea level). */ 
@@ -215,26 +223,57 @@ export class World {
         return tile;
     }
 
+    /** Update the overall climate of the world on a per tile basis.
+     * FUTURE: I'd like to work towards making the math here more realistic over time, but it's not a strict requirement.
+     */
     public updateClimate(): void {
-        console.log('updateClimate');
-        /** 
-         * Some values may end up inspired by https://science.nasa.gov/earth/earth-observatory/climate-and-earths-energy-budget/.
-         * TODO: In order to update the temperature for each tile for PP-4-2's MVP, we need to do the following:
-         * 1. Use DEFAULT_SOLAR_CONSTANT in combination with the tile's elevation and latitude to compute how much the tile can potentially be warmed,
-         * with the understanding that in the future, we may want to account for the atmosphere of the player's World reflecting/radiating energy.
-         * 2. Reduce that value based on the albedo and possibly the elevation of the tile? Not 100% sure on the last part.
-         * 3. Reduce that value further based on the assumption that some heat will radiate away from the player's World (maybe 12-15% to start)?
-         * NOTE: I'd like to work towards making the math here more realistic over time, but it's not a strict requirement.
-         * NOTE: We should have an "updateTileTemperatureForClimate" method here. We also want a method for updating humidity eventually, once we
-         * have a humidity layer, but we should still set the precent that temperature is a separate function call in the body of this one.
-         * */
+        const temperatureMap = matrix(this.tiles.map(row => row.map(tile => tile.temperature)));
+        const averageWorldTemperature = Number(mean(temperatureMap));
+
+        this.updateAllTiles(tile => {
+            tile.temperature = this.updateTileTemperatureForClimate(tile, averageWorldTemperature);
+
+        return tile;
+        });
+    }
+
+    /** Compute the change in a tile's temperature based on the world conditions.
+     * Some values are inspired by https://science.nasa.gov/earth/earth-observatory/climate-and-earths-energy-budget/.
+     */
+    private updateTileTemperatureForClimate(tile: Tile, averageWorldTemperature: number, solarConstant = DEFAULT_SOLAR_CONSTANT): number {
+        // The amount of heating coming in is based off DEFAULT_SOLAR_CONSTANT in combination with the tile's latitude.
+        // Assume the equator gets 100% of the increase, poles get 40% of the increase, and everywhere else somewhere in between.
+        // Higher altitudes get more radiation from the sun, but the actual heating is pretty insignificant.
+        let latitudeVariance = (Math.sin(Math.PI * (this.getDistanceFromEquator(tile) / this.height)) * 0.6) + 0.4;
+        const baseTemperatureIncrease = (solarConstant / 1000) * latitudeVariance;
+        
+        // Reduce that value based on the albedo and possibly the elevation of the tile? Not 100% sure on the last part.
+        // FUTURE: We may want to account for the atmosphere of the player's World reflecting/radiating energy.
+        const albedoReduction = (100 - tile.albedo) / 100;
+
+        // Reduce that value further based on the assumption that some heat will radiate away from the player's World.
+        const baseThermalRadiationReduction = (100 - DEFAULT_SURFACE_THERMAL_RADIATION) / 100;
+        const baseTemperatureDecrease = albedoReduction + baseThermalRadiationReduction;
+
+        // Finally, adjust the tile's temperature delta based on the average temperature of the world.
+        // In the interest of preventing catastrophic temperature feedback loops from destroying a game, we should nudge the world towards a safe temperature.
+        // FUTURE: As we add more systems, this may become less necessary.
+        // BUG: This approach causes a temperature inversion where the equator freezes and the poles boil, so it's temporarily disabled.
+        let temperatureDelta = baseTemperatureIncrease - baseTemperatureDecrease;
+        // const divergenceFromSafeTemperature = averageWorldTemperature - SAFE_AVERAGE_TEMPERATURE;
+        // temperatureDelta += 
+        //     divergenceFromSafeTemperature > 0 ? 
+        //     divergenceFromSafeTemperature * 0.1 :
+        //     divergenceFromSafeTemperature * -0.1;
+
+        return tile.temperature + temperatureDelta;
     }
 
     /** Update the terrain of a tile based on its current metadata. */
     public updateTileTerrain(tile: Tile): Tile {
         // Ocean simulation is simple for now - just go by the current sea level and temperature!
         if (tile.elevation < this.seaLevel) {
-            tile.terrainType = tile.temperature >= 273 ? TerrainType.OCEAN : TerrainType.ICE_CAP;
+            tile.terrainType = tile.temperature >= WATER_FREEZING_TEMPERATURE ? TerrainType.OCEAN : TerrainType.ICE_CAP;
         } else {
             // FUTURE: We have a "freshwater" terrain type defined. This will likely be helpful for water above sea level, but it might be best to handle
             // that seperately from the terrain type. This requires investigating.
@@ -242,9 +281,9 @@ export class World {
             // Terrain types are currently sorted first by temperature, and then by humidity.
             // FUTURE: When we update the terrainType of a tile, we need to set its albedo!
             // Wikipedia gives us some starter values for various terrains.
-            if (tile.temperature < 273) {
+            if (tile.temperature < WATER_FREEZING_TEMPERATURE) {
                 tile.terrainType = TerrainType.POLAR;
-            } else if (tile.temperature >= 273 && tile.temperature < 283) { // 0-10°C
+            } else if (tile.temperature >= WATER_FREEZING_TEMPERATURE && tile.temperature < 283) { // 0-10°C
                 tile.terrainType = 
                     tile.humidity > 50 ? TerrainType.TAIGA : 
                     tile.humidity > 25 ? TerrainType.TUNDRA :
