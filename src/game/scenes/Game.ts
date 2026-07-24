@@ -237,6 +237,7 @@ export class Game extends Scene
             if (this.simulationTicksElapsed % DEFAULT_SIMULATION_TICKS_PER_CLIMATE_UPDATE === 0) {
                 this.world.updateClimate();
                 this.world.updateAllTiles(tile => this.world.updateTileTerrain(tile));
+                this.world.updateAllTiles(tile => this.world.updateTileAlbedo(tile));
             }
 
             // FUTURE: This could be computationally expensive.

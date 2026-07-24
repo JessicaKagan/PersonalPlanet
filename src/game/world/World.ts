@@ -176,7 +176,7 @@ export class World {
         let randomElevationVariance = combinedNoiseResult > 0 ?
             Math.floor(poweredNoiseResult * 2048) :
             Math.floor(poweredNoiseResult * -2048);
-        let latitudeVariance = Math.floor((Math.sin(Math.PI * (this.getDistanceFromEquator(tile) / this.height)) * 128) - 32);
+        let latitudeVariance = Math.floor((Math.cos(Math.PI * (this.getDistanceFromEquator(tile) / this.height)) * 128) - 32);
 
         tile.elevation = this.seaLevel + randomElevationVariance - latitudeVariance;
 
@@ -226,48 +226,55 @@ export class World {
 
     /** Update the overall climate of the world on a per tile basis.
      * FUTURE: I'd like to work towards making the math here more realistic over time, but it's not a strict requirement.
+     * That being said, in order to use the solar constant and thermal rotation constants, we'd apparently need to set up
+     * and (approximately) solve a differential equation representing the energy balance of a tile, or even the whole world.
+     * I haven't learned enough math to understand that yet, so we'll revisit this in the future. 
      */
     public updateClimate(): void {
-        const temperatureMap = matrix(this.tiles.map(row => row.map(tile => tile.temperature)));
-        const averageWorldTemperature = Number(mean(temperatureMap));
+        const oldTemperatureMap = matrix(this.tiles.map(row => row.map(tile => tile.temperature)));
+        const averageWorldTemperature = Number(mean(oldTemperatureMap));
+        
+        // Heating (due to insolation) and cooling are treated as separate steps.
+        this.updateAllTiles(tile => {
+            tile.temperature = this.heatTileForClimate(tile, averageWorldTemperature);
+            return tile;
+        });
 
         this.updateAllTiles(tile => {
-            tile.temperature = this.updateTileTemperatureForClimate(tile, averageWorldTemperature);
+            tile.temperature *= 0.999;
+            return tile;
+        })
 
-        return tile;
+        // Finally, adjust the tile's temperature delta based on the average temperature of the world.
+        // In the interest of preventing catastrophic temperature feedback loops from destroying a game, we should nudge the world towards a safe temperature.
+        // FUTURE: As we add more systems, this may become less necessary.
+        this.updateAllTiles(tile => {
+            const divergenceFromSafeTemperature = averageWorldTemperature - SAFE_AVERAGE_TEMPERATURE;
+            tile.temperature += 
+                divergenceFromSafeTemperature > 0 ? 
+                divergenceFromSafeTemperature * 0.1 :
+                divergenceFromSafeTemperature * -0.1;
+            return tile;
         });
     }
 
     /** Compute the change in a tile's temperature based on the world conditions.
      * Some values are inspired by https://science.nasa.gov/earth/earth-observatory/climate-and-earths-energy-budget/.
      */
-    private updateTileTemperatureForClimate(tile: Tile, averageWorldTemperature: number, solarConstant = DEFAULT_SOLAR_CONSTANT): number {
+    private heatTileForClimate(tile: Tile, solarConstant = DEFAULT_SOLAR_CONSTANT): number {
         // The amount of heating coming in is based off DEFAULT_SOLAR_CONSTANT in combination with the tile's latitude.
         // Assume the equator gets 100% of the increase, poles get 40% of the increase, and everywhere else somewhere in between.
-        // Higher altitudes get more radiation from the sun, but the actual heating is pretty insignificant.
-        let latitudeVariance = (Math.sin(Math.PI * (this.getDistanceFromEquator(tile) / this.height)) * 0.6) + 0.4;
+        let latitudeVariance = (Math.cos(Math.PI * (this.getDistanceFromEquator(tile) / this.height)) * 0.6) + 0.4;
         const baseTemperatureIncrease = (solarConstant / 1000) * latitudeVariance;
         
-        // Reduce that value based on the albedo and possibly the elevation of the tile? Not 100% sure on the last part.
-        // FUTURE: We may want to account for the atmosphere of the player's World reflecting/radiating energy.
+        // Reduce that value based on the albedo.
         const albedoReduction = (100 - tile.albedo) / 100;
+        const netTemperatureIncrease = baseTemperatureIncrease * albedoReduction;
 
-        // Reduce that value further based on the assumption that some heat will radiate away from the player's World.
-        const baseThermalRadiationReduction = (100 - DEFAULT_SURFACE_THERMAL_RADIATION) / 100;
-        const baseTemperatureDecrease = albedoReduction + baseThermalRadiationReduction;
-
-        // Finally, adjust the tile's temperature delta based on the average temperature of the world.
-        // In the interest of preventing catastrophic temperature feedback loops from destroying a game, we should nudge the world towards a safe temperature.
-        // FUTURE: As we add more systems, this may become less necessary.
-        // BUG: This approach causes a temperature inversion where the equator freezes and the poles boil, so it's temporarily disabled.
-        let temperatureDelta = baseTemperatureIncrease - baseTemperatureDecrease;
-        // const divergenceFromSafeTemperature = averageWorldTemperature - SAFE_AVERAGE_TEMPERATURE;
-        // temperatureDelta += 
-        //     divergenceFromSafeTemperature > 0 ? 
-        //     divergenceFromSafeTemperature * 0.1 :
-        //     divergenceFromSafeTemperature * -0.1;
-
-        return tile.temperature + temperatureDelta;
+        
+        // FUTURE: We may want to account for the atmosphere of the player's World reflecting/radiating energy.
+        // This would reduce heating further.
+        return tile.temperature + netTemperatureIncrease;
     }
 
     /** Update the terrain of a tile based on its current metadata. */
@@ -351,10 +358,10 @@ export class World {
      * @param blurFactor The number of tiles to blur in each direction
      */
     public erodeWorld(blurFactor: number = 3): void {
-        const blurredElevations = MathService.boxBlur(matrix(this.tiles.map(row => row.map(tile => tile.elevation))), blurFactor);
+        const smoothedElevations = MathService.boxBlur(matrix(this.tiles.map(row => row.map(tile => tile.elevation))), blurFactor);
 
-        blurredElevations.forEach((value: number, tileIndex: number[]) => {
+        smoothedElevations.forEach((value: number, tileIndex: number[]) => {
             this.tiles[tileIndex[0]][tileIndex[1]].elevation = Number(value);
-        })
+        });
     }
 }
