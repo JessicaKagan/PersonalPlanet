@@ -84,6 +84,7 @@ export class Game extends Scene
         // Then, set up the Game scene's controls.
         this.camera = this.cameras.main;
         this.camera.setBackgroundColor(0x000000);
+        this.camera.zoom = 1/8; // Start zoomed out, for a better view of the world.
         
         // FUTURE: Allowing the camera to scroll slightly (2-3 tiles) past the world bounds will help make tiles easier to interact with
         // and make absolutely certain that users can view the entire world. I'd like to eventually make the world wrap horizontally,
