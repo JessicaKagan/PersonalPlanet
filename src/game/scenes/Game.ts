@@ -67,7 +67,6 @@ export class Game extends Scene
             hotContext.on("vite:beforeUpdate", () => {
                 if (this.updateSimulationTimeoutHandler !== undefined) {
                     clearTimeout(this.updateSimulationTimeoutHandler);
-                    console.log('cleared timeout');
                 }
             });
         }
