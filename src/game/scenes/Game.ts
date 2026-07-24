@@ -18,7 +18,9 @@ export class Game extends Scene
 {
     camera: Phaser.Cameras.Scene2D.Camera;
     world: World;
-    tileMap: Phaser.GameObjects.TileSprite[] = [];
+
+    /** The representation of each World tile in the renderer. */
+    tileSpriteMap: Phaser.GameObjects.TileSprite[] = [];
 
     public updateInterval = 1000 / DEFAULT_SIMULATION_TICKS_PER_SECOND; // Update the simulation every 20ms by default.
 
@@ -64,7 +66,7 @@ export class Game extends Scene
         this.world = new World(DEFAULT_WORLD_SIZE.x, DEFAULT_WORLD_SIZE.y);
         this.world.populateWorld();
         this.renderInitialWorld();
-        
+
         // Then, set up the Game scene's controls.
         this.camera = this.cameras.main;
         this.camera.setBackgroundColor(0x000000);
@@ -172,8 +174,8 @@ export class Game extends Scene
     /** Create our initial graphical representation of the user's World. */
     renderInitialWorld(): void {
         // Clear existing tiles
-        this.tileMap.forEach(tile => tile.destroy());
-        this.tileMap = [];
+        this.tileSpriteMap.forEach(tile => tile.destroy());
+        this.tileSpriteMap = [];
         
         // Render each tile in the world
         const tiles = this.world.getTiles();
@@ -203,7 +205,7 @@ export class Game extends Scene
                     tileSprite.setData({tileID: tile.id, worldX: tile.x, worldY: tile.y})
                     
                     // Store reference for potential updates
-                    this.tileMap.push(tileSprite);
+                    this.tileSpriteMap.push(tileSprite);
                 }
             }
         }
@@ -235,61 +237,29 @@ export class Game extends Scene
                 this.world.updateAllTiles(tile => this.world.updateTileTerrain(tile));
             }
 
+            // FUTURE: This could be computationally expensive.
+            // Is there a way that we can start tracking which tiles in a world need a visual update and only updating those?
+            for (const tileSprite of this.tileSpriteMap) {
+                this.updateTileVisual(tileSprite);
+            }
+
             this.updateSimulation();
         }, this.updateInterval);
-        // Every time Phaser produces a new frame, check if the simulation needs an update.
-        // FUTURE: We most likely want this to work the other way around - i.e, the simulation itself should update consistently (as possible),
-        // and the renderer should pick up any changes to the in-game world that have happened since the last frame.
-        this.timeSinceLastUpdate += delta;
-        if (this.timeSinceLastUpdate >= this.updateInterval) {
-            this.updateSimulation();
-
-            this.timeSinceLastUpdate = 0;
-        }
     }
 
-    // TODO: Figure out if this and updateTileVisual should be moved to an "Update" file. Perhaps its own folder, too?
-    updateSimulation()
-    {
-        // This is where we would update simulation layers at different frequencies
-        // For now, let's just do a simple debug update to test that components work together
-        
-        // Update some tiles randomly for testing
-        if (Math.random() > 0.7) { // 30% chance to change a tile each tick
-            const x = Math.floor(Math.random() * this.world.getWidth());
-            const y = Math.floor(Math.random() * this.world.getHeight());
-            
-            const tile = this.world.getTile(x, y);
-            if (tile && tile.terrainType !== TerrainType.EMPTY) {
-                // Change to a different terrain type for testing
-                const terrainTypes = [
-                    TerrainType.OCEAN,
-                    TerrainType.FRESHWATER,
-                    TerrainType.GRASSLAND,
-                    TerrainType.TUNDRA,
-                    TerrainType.TAIGA,
-                    TerrainType.HOT_DESERT
-                ];
-                tile.terrainType = terrainTypes[Math.floor(Math.random() * terrainTypes.length)];
-                
-                // Update the visual representation
-                this.updateTileVisual(x, y);
-            }
-        }
-    }
+    /** Update the visual representation of a tile in the world.
+     * As of PP-4-2, this currently only updates tile textures.
+     * @param tileSprite A Phaser tileSprite, which crucially contains the custom data we added in renderInitialWorld().
+     */
+    private updateTileVisual(tileSprite: Phaser.GameObjects.TileSprite): void {
+        const tile = this.world.getTile(tileSprite.getData('worldX'), tileSprite.getData('worldY'));
 
-    updateTileVisual(x: number, y: number)
-    {
-        // Find and update the corresponding sprite
-        const tile = this.world.getTile(x, y);
-        if (tile) {
-            const index = y * this.world.getWidth() + x;
-            
-            if (this.tileMap[index]) {
-                // Update the texture of the sprite
-                this.tileMap[index].setTexture(this.world.getTileTextureKey(tile.terrainType));
-            }
+        if (!tile) {
+            return;
         }
+
+        // The tileSprite is passed by reference, so we can update the contents of tileSpriteMap without having to mess with array indices et al.
+        tileSprite.setTexture(this.world.getTileTextureKey(tile.terrainType));
     }
 
     changeScene ()
