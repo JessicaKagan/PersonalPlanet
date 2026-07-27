@@ -44,6 +44,19 @@
         }
     });
 
+
+    // Whenever the simulation updates while the tile information dialog is open,
+    // we should update the data in the query info. This is most relevant for the detailed view.
+    EventBus.on(CustomPhaserEvents.SimulationUpdated, () => {
+        const scene = phaserRef.scene as Game;
+
+        if (!scene) {
+            return;
+        }
+
+        currentQueryInfo = scene.currentQueryInfo;
+    });
+
     EventBus.on(CustomPhaserEvents.TileSelected, (queryInfo: QueryInfo) => {
         dialogMode = TileInformationDialogMode.DETAILED;
         currentQueryInfo = queryInfo;

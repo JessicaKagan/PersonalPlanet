@@ -258,6 +258,13 @@ export class Game extends Scene
             for (const tileSprite of this.tileSpriteMap) {
                 RenderingService.updateTileVisual(this.world, tileSprite);
             }
+            
+            // Update our information about the currently queried tile for the TileInformation component.
+            if (this.currentQueryInfo.tile) {
+                const updatedTile = this.world.getTile(this.currentQueryInfo.tile.x, this.currentQueryInfo.tile.y);
+                this.setQueryInfo(updatedTile);
+                EventBus.emit(CustomPhaserEvents.SimulationUpdated);
+            }
 
             this.updateSimulationTimeoutHandler = this.updateSimulation();
         }, this.updateInterval);

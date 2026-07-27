@@ -31,7 +31,8 @@ export enum CustomPhaserEvents {
     CurrentSceneReady = 'CurrentSceneReady',
     CurrentWorldControlToolSelected = 'CurrentWorldControlToolSelected',
     CursorPositionInViewPort = 'CurrentPositionInViewPort',
-    TileSelected = 'TileSelected'
+    TileSelected = 'TileSelected',
+    SimulationUpdated = 'SimulationUpdated'
 }
 
 /** FUTURE: This interface will be expanded as we add more to the simulation that we'd like to show using the query tool.
