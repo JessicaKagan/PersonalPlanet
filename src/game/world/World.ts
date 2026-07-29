@@ -3,10 +3,14 @@
  */
 import { matrix, mean } from 'mathjs';
 import { TerrainType } from './TerrainType';
-import type { Tile } from './Tile';
+import { isTileAquatic, type Tile } from './Tile';
 import { createNoise2D } from 'simplex-noise';
 import { SAFE_AVERAGE_TEMPERATURE, WATER_FREEZING_TEMPERATURE } from '../defines/core_defines';
+import { DEFAULT_LIFEFORMS } from '../defines/lifeforms';
+import { getSizeMultiplierForInitialLifeformCount } from './Lifeforms';
+
 import * as MathService from '../services/math';
+import * as UtilitiesService from '../services/utilities';
 
 export const DEFAULT_WORLD_SIZE = { x: 128, y: 64 };
 /** 1.361 kilowatts per square meter */
@@ -81,7 +85,7 @@ export class World {
                     albedo: 0,
                     humidity: 0,
                     elevation: 0,
-                    life: {}
+                    life: []
                 };
             }
         }
@@ -158,6 +162,9 @@ export class World {
         // After the tiles' climate metadata has been generated to our liking, we should have enough information to derive the tile's terrain.
         this.updateAllTiles(tile => this.updateTileTerrain(tile));
         this.updateAllTiles(tile => this.updateTileAlbedo(tile));
+
+        // From there, seed the world with its initial lifeforms.
+        this.updateAllTiles(tile => this.populateInitialTileLife(tile));
     }
     
     /** Generate an initial height for each tile.
@@ -222,6 +229,67 @@ export class World {
 
         tile.humidity = Math.floor(Math.abs(combinedNoiseResult) * 100);
         
+        return tile;
+    }
+
+    /** Generate an initial Lifeform population for each tile. */
+    private populateInitialTileLife(tile: Tile): Tile {
+        /**
+         * To populate the initial Lifeforms for a tile:
+         * 1. Choose a subset of Lifeforms to use. We need to hard-filter out any life that's incapable of surviving on this tile,
+         * and then select a small amount of them randomly.
+         */
+        let validLifeformsForTile = DEFAULT_LIFEFORMS.filter(lifeform => {
+            return isTileAquatic(tile) ? lifeform.isAquatic : !lifeform.isAquatic;
+        });
+
+        UtilitiesService.shuffleArray(validLifeformsForTile);
+
+        let lifeTypesToPopulate = 0;
+
+        // FUTURE: As we define more lifeforms, we should reduce the percentage of initial lifeform types seeded in each tile.
+        if (Math.floor(validLifeformsForTile.length * 0.25) < 5) {
+            lifeTypesToPopulate = 5;
+        } else {
+            lifeTypesToPopulate = Math.floor(validLifeformsForTile.length * 0.25);
+        }
+
+        if (validLifeformsForTile.length > lifeTypesToPopulate) {
+            validLifeformsForTile.length = lifeTypesToPopulate;
+        };
+
+        /**
+         * 2. For each type of lifeform we've chosen, determine how many to add based on the lifeform's size, 
+         * as well as how hospitable the tile is for that type of life. We should randomize this value by nudging it by about 5-10% of its value.
+         */
+        validLifeformsForTile.forEach(lifeForm => {
+            const initialCount = getSizeMultiplierForInitialLifeformCount(lifeForm.size);
+            const divergenceFromPreferredTemperature = Math.abs(lifeForm.preferredTemperature - tile.temperature);
+            const divergenceFromPreferredHumidity = lifeForm.isAquatic ? 0 : Math.abs(lifeForm.preferredHumidity - tile.humidity);
+
+            let climateMismatchReductionFactor;
+            // For now, each degree Kelvin away from the preferred temperature reduces the count by 5%,
+            // and each percentage away from preferred humidity reduces the count by 2%.
+            // FUTURE: These values are subject to change and will probably become stricter over time.
+            const temperatureMismatchReductionPercentage = (100 - divergenceFromPreferredTemperature * 5) / 100;
+            const humidityMismatchReductionPercentage = (100 - divergenceFromPreferredTemperature * 0.25) / 100;
+
+            if (temperatureMismatchReductionPercentage < 0 || humidityMismatchReductionPercentage < 0) {
+                climateMismatchReductionFactor = 0;
+            } else {
+                climateMismatchReductionFactor = temperatureMismatchReductionPercentage * humidityMismatchReductionPercentage;
+            }
+
+            const lifeFormCount = Math.round(initialCount * climateMismatchReductionFactor * (0.9 + (Math.random() * 0.2)));
+
+            if (lifeFormCount > 0) {
+                tile.life.push({
+                    type: lifeForm,
+                    count: lifeFormCount
+                });
+            }
+        });
+
         return tile;
     }
 
