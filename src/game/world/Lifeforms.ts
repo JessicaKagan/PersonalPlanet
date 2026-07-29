@@ -1,0 +1,26 @@
+/** Represents a type of living being that can appear in a player's World. */
+export interface Lifeform {
+    name: string;
+    size: LifeFormSize;
+    preferredTemperature: number;
+    preferredHumidity: number;
+    isAquatic: boolean;
+}
+
+/** General size categories for Lifeforms. These are intentionally left vague.
+ * As of 07/29/2026, these will be used primarily for estimating the carrying capacity of a Tile.
+ */
+export enum LifeFormSize {
+    /** Invisible to the naked eye. Bacteria, algae, plankton. */
+    Microscopic,
+    /** The smallest things humans can see. Grass, some types of fungi, insects. */
+    Tiny,
+    /** Anything larger than an insect or blade of grass, up to perhaps the size of common pets like cats, dogs, rabbits, etc for animals, flowers and shrubs for plants, etc. */
+    Small,
+    /** Life forms at approximately a human scale. Humans count! */
+    Medium,
+    /** Life forms that are appreciably larger than humans, up to an order of magnitude tops. Big mammals and reptiles, trees, etc. */
+    Large,
+    /** The largest life forms. Probably starting at megafauna like whales and elephants. Pando would feel right at home here. */
+    Huge
+}
