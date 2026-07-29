@@ -1,8 +1,14 @@
 /** Represents a type of living being that can appear in a player's World. */
 export interface Lifeform {
+    // FUTURE: When we start showing Lifeform information to players in the UI,
+    // we should add some name-related properties for prettyprinting. For example,
+    // we could include the preferred plural form of a Lifeform's name.
     name: string;
     size: LifeFormSize;
     preferredTemperature: number;
+    
+    // FUTURE: How many purely aquatic lifeforms are going to care about humidity?
+    // In addition - how do we handle amphibious life?
     preferredHumidity: number;
     isAquatic: boolean;
 }
