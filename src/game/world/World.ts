@@ -5,7 +5,7 @@ import { matrix, mean } from 'mathjs';
 import { TerrainType } from './TerrainType';
 import type { Tile } from './Tile';
 import { createNoise2D } from 'simplex-noise';
-import { SAFE_AVERAGE_TEMPERATURE, WATER_FREEZING_TEMPERATURE } from '../defines';
+import { SAFE_AVERAGE_TEMPERATURE, WATER_FREEZING_TEMPERATURE } from '../defines/core_defines';
 import * as MathService from '../services/math';
 
 export const DEFAULT_WORLD_SIZE = { x: 128, y: 64 };

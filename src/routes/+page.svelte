@@ -7,7 +7,7 @@
 
     import WorldControls from "../lib/components/menus/world_controls.svelte";
     import TileInformation from "../lib/components/dialogs/tile_information.svelte";
-    import { CustomPhaserEvents, WorldControlsTools } from "../game/defines";
+    import { CustomPhaserEvents, WorldControlsTools } from "../game/defines/core_defines";
     import { EventBus } from "../game/EventBus";
     import type { Game } from "../game/scenes/Game";
 

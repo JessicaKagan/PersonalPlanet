@@ -1,9 +1,8 @@
-/** A list of constant values used in Personal Planet. In the long term, we may want to split this into multiple files.
- * We should also plan to make more values dynamically configurable where it makes sense. In that case, expect many of these
- * to become defaults.
+/** A list of constant values used in Personal Planet. Over time, we'll split this into multiple files.
+ * We'll also make more values dynamically configurable where it makes sense, and otherwise use the values here as defaults.
  */
 
-import type { Tile } from "./world/Tile";
+import type { Tile } from "../world/Tile";
 
 export const DEFAULT_TILE_SIZE = 64;
 

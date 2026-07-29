@@ -3,7 +3,13 @@
 
     import type { TPhaserRef } from "../../../PhaserGame.svelte";
     import type { Game } from "../../../game/scenes/Game";
-    import { CustomPhaserEvents, TileInformationDialogMode, WATER_FREEZING_TEMPERATURE, WorldControlsTools, type QueryInfo } from "../../../game/defines";
+    import { 
+        CustomPhaserEvents,
+        TileInformationDialogMode,
+        WATER_FREEZING_TEMPERATURE,
+        WorldControlsTools,
+        type QueryInfo 
+    } from "../../../game/defines/core_defines";
     import { EventBus } from "../../../game/EventBus";
 
     interface TileInformationProps {

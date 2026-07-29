@@ -1,6 +1,6 @@
 <script lang="ts">
     import RootMenu from "../root_menu.svelte";
-    import { WorldControlsTools } from "../../../game/defines";
+    import { WorldControlsTools } from "../../../game/defines/core_defines";
 
     import type { TPhaserRef } from "../../../PhaserGame.svelte";
     import type { Game } from "../../../game/scenes/Game";
