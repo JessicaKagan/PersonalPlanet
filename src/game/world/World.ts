@@ -80,7 +80,8 @@ export class World {
                     temperature: 0,
                     albedo: 0,
                     humidity: 0,
-                    elevation: 0
+                    elevation: 0,
+                    life: {}
                 };
             }
         }

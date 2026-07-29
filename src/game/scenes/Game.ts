@@ -1,7 +1,8 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { World, DEFAULT_WORLD_SIZE } from '../world/World';
-import { DEFAULT_TILE_SIZE, type Tile } from '../world/Tile';
+import { type Tile } from '../world/Tile';
+import { DEFAULT_TILE_SIZE } from '../defines';
 import { 
     DEFAULT_SIMULATION_TICKS_PER_SECOND,
     DEFAULT_ZOOM_TICK,

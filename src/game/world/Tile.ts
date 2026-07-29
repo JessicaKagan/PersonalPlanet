@@ -2,9 +2,15 @@
  * Represents a single tile in the game world.
  * As of PP-1 (06/03/2026), a world in Personal Planet is a rectangular array of tiles.
  */
+import type { Lifeform } from './Lifeforms';
 import { TerrainType } from './TerrainType';
 
-export const DEFAULT_TILE_SIZE = 64;
+export type LifeformsInTile = {
+    [key: number]: {
+        type: Lifeform,
+        count: number
+    }
+}
 
 export interface Tile {
     /** BASIC TILE INFORMATION */
@@ -43,13 +49,6 @@ export interface Tile {
     humidity: number;
     /** The average relative height of a tile in meters. Use positive numbers here, probably capped to a maximum of 2^15 meters for versimilitude. */
     elevation: number;
-
-    // FUTURE: What use cases are there for having arbitrary metadata in a tile?
-    // We can remove this in the future if we want to discourage the pattern.
-    /**
-     * Additional metadata for the tile
-     */
-    // metadata?: {
-    //     [key: string]: any;
-    // };
+    /** The lifeforms present in a tile. */
+    life: LifeformsInTile;
 }
