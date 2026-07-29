@@ -6,10 +6,8 @@ import type { Lifeform } from './Lifeforms';
 import { TerrainType } from './TerrainType';
 
 export type LifeformsInTile = {
-    [key: number]: {
-        type: Lifeform,
-        count: number
-    }
+    type: Lifeform,
+    count: number
 }
 
 export interface Tile {
@@ -50,5 +48,12 @@ export interface Tile {
     /** The average relative height of a tile in meters. Use positive numbers here, probably capped to a maximum of 2^15 meters for versimilitude. */
     elevation: number;
     /** The lifeforms present in a tile. */
-    life: LifeformsInTile;
+    life: LifeformsInTile[];
+}
+
+/** A shorthand function for determining whether a tile represents a water biome.
+ * This was added in order to make life layer logic easier to read.
+ */
+export function isTileAquatic(tile: Tile): boolean {
+    return tile.terrainType === TerrainType.OCEAN || tile.terrainType === TerrainType.ICE_CAP || tile.terrainType === TerrainType.FRESHWATER;
 }

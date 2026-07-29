@@ -11,6 +11,9 @@ export interface Lifeform {
     // In addition - how do we handle amphibious life?
     preferredHumidity: number;
     isAquatic: boolean;
+
+    // FUTURE: We should implement some values representing a lifeform's tolerance of different climates - hardiness factors
+    // for humidity and temperature, to begin with.
 }
 
 /** General size categories for Lifeforms. These are intentionally left vague.
@@ -29,4 +32,21 @@ export enum LifeFormSize {
     Large,
     /** The largest life forms. Probably starting at megafauna like whales and elephants. Pando would feel right at home here. */
     Huge
+}
+
+export function getSizeMultiplierForInitialLifeformCount(size: LifeFormSize) {
+    switch (size) {
+        case LifeFormSize.Microscopic:
+            return Math.pow(2, 20); // 1,048,576
+        case LifeFormSize.Tiny:
+            return Math.pow(2, 12); // 4,096
+        case LifeFormSize.Small:
+            return Math.pow(2, 6); // 64
+        case LifeFormSize.Medium:
+            return 16;
+        case LifeFormSize.Large:
+            return 4;
+        case LifeFormSize.Huge:
+            return 1;
+    }
 }
