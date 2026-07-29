@@ -5,15 +5,18 @@ export interface Lifeform {
     // we could include the preferred plural form of a Lifeform's name.
     name: string;
     size: LifeFormSize;
-    preferredTemperature: number;
     
+    preferredTemperature: number;
+    preferredHumidity: number;
+
     // FUTURE: How many purely aquatic lifeforms are going to care about humidity?
     // In addition - how do we handle amphibious life?
-    preferredHumidity: number;
     isAquatic: boolean;
 
-    // FUTURE: We should implement some values representing a lifeform's tolerance of different climates - hardiness factors
-    // for humidity and temperature, to begin with.
+    // Hardiness represents how well a lifeform tolerates a non-ideal climate.
+    // The default for each of these is 1. Use smaller values for especially picky or delicate species, and larger for more adaptable ones.
+    temperatureHardinessFactor: number;
+    humidityHardinessFactor: number;
 }
 
 /** General size categories for Lifeforms. These are intentionally left vague.

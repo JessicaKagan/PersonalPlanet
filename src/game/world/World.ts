@@ -271,8 +271,8 @@ export class World {
             // For now, each degree Kelvin away from the preferred temperature reduces the count by 5%,
             // and each percentage away from preferred humidity reduces the count by 2%.
             // FUTURE: These values are subject to change and will probably become stricter over time.
-            const temperatureMismatchReductionPercentage = (100 - divergenceFromPreferredTemperature * 5) / 100;
-            const humidityMismatchReductionPercentage = (100 - divergenceFromPreferredTemperature * 0.25) / 100;
+            const temperatureMismatchReductionPercentage = (100 - (divergenceFromPreferredTemperature * 5 * lifeForm.temperatureHardinessFactor)) / 100;
+            const humidityMismatchReductionPercentage = (100 - (divergenceFromPreferredHumidity * 0.25 * lifeForm.humidityHardinessFactor)) / 100;
 
             if (temperatureMismatchReductionPercentage < 0 || humidityMismatchReductionPercentage < 0) {
                 climateMismatchReductionFactor = 0;

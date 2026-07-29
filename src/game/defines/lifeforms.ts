@@ -13,48 +13,62 @@ export const DEFAULT_LIFEFORMS: Lifeform[] = [
         size: LifeFormSize.Tiny,
         preferredTemperature: 293,
         preferredHumidity: 50,
-        isAquatic: false
+        isAquatic: false,
+        temperatureHardinessFactor: 1,
+        humidityHardinessFactor: 2
     },
     {
         name: "cow",
         size: LifeFormSize.Large,
         preferredTemperature: 293,
         preferredHumidity: 50,
-        isAquatic: false
+        isAquatic: false,
+        temperatureHardinessFactor: 1,
+        humidityHardinessFactor: 1
     },
     {
         name: "wolf",
         size: LifeFormSize.Medium,
         preferredTemperature: 293,
         preferredHumidity: 75,
-        isAquatic: false
+        isAquatic: false,
+        temperatureHardinessFactor: 1,
+        humidityHardinessFactor: 1
     },
     {
         name: "plankton",
         size: LifeFormSize.Microscopic,
         preferredTemperature: 303,
         preferredHumidity: 50,
-        isAquatic: true
+        isAquatic: true,
+        temperatureHardinessFactor: 4,
+        humidityHardinessFactor: 1
     },
     {
         name: "herring",
         size: LifeFormSize.Small,
         preferredTemperature: 283,
         preferredHumidity: 50,
-        isAquatic: true
+        isAquatic: true,
+        temperatureHardinessFactor: 1,
+        humidityHardinessFactor: 1
     },
     {
         name: "shark",
         size: LifeFormSize.Large,
         preferredTemperature: 283,
         preferredHumidity: 50,
-        isAquatic: true
+        isAquatic: true,
+        temperatureHardinessFactor: 1,
+        humidityHardinessFactor: 1
     },
     {
         name: "whale",
         size: LifeFormSize.Huge,
         preferredTemperature: 278,
         preferredHumidity: 50,
-        isAquatic: true
+        isAquatic: true,
+        temperatureHardinessFactor: 1,
+        humidityHardinessFactor: 1
     },
 ]
