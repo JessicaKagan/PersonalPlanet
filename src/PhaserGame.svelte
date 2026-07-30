@@ -44,3 +44,11 @@
 </script>
 
 <div id="game-container"></div>
+
+<style lang="scss">
+    #game-container {
+        // Horizontally center the game graphics in the middle of the user's window.
+        display: flex;
+        justify-content: center;
+    }
+</style>
