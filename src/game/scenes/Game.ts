@@ -82,19 +82,27 @@ export class Game extends Scene
         this.renderInitialWorld();
 
         // Then, set up the Game scene's controls.
-        this.camera = this.cameras.main;
-        this.camera.setBackgroundColor(0x000000);
-        this.camera.zoom = 1/8; // Start zoomed out, for a better view of the world.
-        
-        // FUTURE: Allowing the camera to scroll slightly (2-3 tiles) past the world bounds will help make tiles easier to interact with
-        // and make absolutely certain that users can view the entire world. I'd like to eventually make the world wrap horizontally,
-        // so any implementation before that would need to be revised afterwards.
-        this.camera.setBounds(0, 0, DEFAULT_WORLD_SIZE.x * DEFAULT_TILE_SIZE, DEFAULT_WORLD_SIZE.y * DEFAULT_TILE_SIZE);
+        this.addCamera();
         this.addControls();
 
         // Finally, begin running the simulation, and tell other components the current scene is ready.
         this.updateSimulationTimeoutHandler = this.updateSimulation();
         EventBus.emit('current-scene-ready', this);
+    }
+
+    addCamera(): void {
+        this.camera = this.cameras.main;
+        this.camera.setBackgroundColor(0x000000);
+        this.camera.zoom = 1/8; // Start zoomed out, for a better view of the world.
+        
+        // Allowing the camera to scroll slightly past the world bounds makes tiles easier to interact with and ensures that users can view the entire world.
+        // FUTURE: I'd like to eventually make the world wrap horizontally, so we'll need to revisit this at some point.
+        this.camera.setBounds(
+            -8 * DEFAULT_TILE_SIZE,
+            -8 * DEFAULT_TILE_SIZE,
+            (this.world.width + 8) * DEFAULT_TILE_SIZE,
+            (this.world.height + 8) * DEFAULT_TILE_SIZE
+        );
     }
 
     addControls(): void {
