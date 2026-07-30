@@ -28,7 +28,7 @@ export function getTileTextureKey(terrainType: TerrainType): string {
         case TerrainType.FRESHWATER:
             return 'shallow water';
         case TerrainType.POLAR:
-            return 'tundra';
+            return 'snow';
         case TerrainType.TUNDRA:
             return 'tundra snowy';
         case TerrainType.TAIGA:
