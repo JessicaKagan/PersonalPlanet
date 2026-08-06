@@ -1,4 +1,6 @@
 /** A home for the methods used to render graphics based on the current game and simulation state. */
+import type { Scene } from 'phaser';
+import { GraphicsOverlays } from '../defines/core_defines';
 import { TerrainType } from '../world/TerrainType';
 import type { World } from '../world/World';
 
@@ -9,6 +11,30 @@ export interface OverlayMap {
     shapes: Phaser.GameObjects.Shape[];
     sprites: Phaser.GameObjects.Sprite[];
     tileSprites: Phaser.GameObjects.TileSprite[];
+}
+
+/** Use the current state of the simulation to generate relevant overlay graphics objects for Phaser to render whenever the game scene updates.
+ * FUTURE: Investigate how we can this method (or at least as much of it as reasonably possible) to RenderingService.
+ * @warning For performance reasons, you should only call this method if the user changes their overlay, or in response to relevant updateSimulation() calls.
+ * @param overlayMap A reference to overlayMap in the Game scene.
+ * @param overlayType The overlay that needs graphics generated
+ * @param world A reference to the player's world, and therefore the data we need to visualize
+ * @param scene A reference to the current scene, so we can add graphics objects to the scene
+ */
+export function updateOverlayMap(overlayMap: OverlayMap, overlayType: GraphicsOverlays, world: World, scene: Scene): void {
+    // FUTURE: Simple shapes should be cleaned up and regenerated whenever we update the overlay map.
+    // On the other hand, we may want to deactivate (setActive((false)) more complex objects and make them invisible,
+    // in case we still want to keep track of them. This will require further research and planning.
+    overlayMap.shapes.forEach(shape => shape.destroy());
+    overlayMap.shapes = [];
+
+    switch (overlayType) {
+        case GraphicsOverlays.Lifeforms:
+            overlayMap.shapes = getShapesForLifeformsLayer(world, scene);
+        case GraphicsOverlays.None:
+        default:
+            break;
+    }
 }
 
 /** Update the visual representation of a tile in the world.
@@ -63,4 +89,10 @@ export function getTileTextureKey(terrainType: TerrainType): string {
         default:
             return 'ocean'; // Default fallback
     }
+}
+
+function getShapesForLifeformsLayer(world: World, scene: Scene): Phaser.GameObjects.Shape[] {
+    const test = scene.add.rectangle(128, 128, 64, 64, 0x00ff00, 0.5);
+    console.log('test', test);
+    return [test];
 }

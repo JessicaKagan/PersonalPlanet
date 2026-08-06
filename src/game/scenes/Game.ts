@@ -77,14 +77,7 @@ export class Game extends Scene
         this._currentOverlay = overlay;
         EventBus.emit(CustomPhaserEvents.OverlaySelected, this._currentOverlay);
 
-        // When the user stops viewing overlays, clean everything out.
-        if (this._currentOverlay === GraphicsOverlays.None) {
-            this.overlayMap = {
-                shapes: [],
-                sprites: [],
-                tileSprites: []
-            };
-        }
+        RenderingService.updateOverlayMap(this.overlayMap, overlay, this.world, this.scene.scene);
     }
 
 
@@ -277,14 +270,6 @@ export class Game extends Scene
         this.timeSinceLastSceneUpdate = delta;
     }
 
-    /** Use the current state of the simulation to generate relevant overlay graphics objects for Phaser to render whenever the game scene updates.
-     * @warning For performance reasons, you should only call this method in response to relevant updateSimulation() calls.
-     * FUTURE: Investigate how we can this method (or at least as much of it as reasonably possible) to RenderingService.
-     */
-    private updateOverlayMap(overlayType: GraphicsOverlays): void {
-
-    }
-
     // TODO: Figure out if this and updateTileVisual should be moved to an "Update" file. Perhaps its own folder, too?
     /** Run simulation update tasks at preset intervals.
      * @returns A numeric ID for tracking the recursive timeout loop used to run simulation ticks.
@@ -304,7 +289,7 @@ export class Game extends Scene
 
             if (this.simulationTicksElapsed % DEFAULT_SIMULATION_TICKS_PER_LIFE_UPDATE === 0) {
                 if (this.currentOverlay === GraphicsOverlays.Lifeforms) {
-                    this.updateOverlayMap(GraphicsOverlays.Lifeforms);
+                    RenderingService.updateOverlayMap(this.overlayMap, GraphicsOverlays.Lifeforms, this.world, this.scene.scene);
                 }
             }
 
