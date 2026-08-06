@@ -1,8 +1,9 @@
 /** A home for the methods used to render graphics based on the current game and simulation state. */
 import type { Scene } from 'phaser';
-import { GraphicsOverlays } from '../defines/core_defines';
+import { DEFAULT_TILE_SIZE, GraphicsOverlays } from '../defines/core_defines';
 import { TerrainType } from '../world/TerrainType';
 import type { World } from '../world/World';
+import { BIOMASS_COLOR } from '../defines/rendering_defines';
 
 /** Each overlay in Personal Planet potentially requires us to track a variety of graphical elements.
  * The OverlayMap allows us to bundle together and update any relevant overlay graphics in one pass.
@@ -91,8 +92,30 @@ export function getTileTextureKey(terrainType: TerrainType): string {
     }
 }
 
+/** Generate the shapes for the lifeforms overlay - a translucent green square for any tile that has life in it.
+ */
 function getShapesForLifeformsLayer(world: World, scene: Scene): Phaser.GameObjects.Shape[] {
-    const test = scene.add.rectangle(128, 128, 64, 64, 0x00ff00, 0.5);
-    console.log('test', test);
-    return [test];
+    const biomassShapes: Phaser.GameObjects.Shape[] = [];
+    const tiles = world.getTiles().flat().filter(tile => tile.biomass > 0);
+
+    // The tile(s) with the highest biomass get the highest opacity (50%).
+    const maximumBiomass = Math.max(...tiles.map(tile => tile.biomass));
+
+    /** TODO: It looks like there's a significant performance cost to generating a bunch of shapes.
+     * Using a prebaked "overlay" (really, just a green square) will perform significantly better, so let's update that ASAP. */
+    for(let tile of tiles) {
+        const opacity = (tile.biomass / maximumBiomass) * 0.5;
+        const biomassRectangle = scene.add.rectangle(
+            tile.x * DEFAULT_TILE_SIZE,
+            tile.y * DEFAULT_TILE_SIZE,
+            DEFAULT_TILE_SIZE,
+            DEFAULT_TILE_SIZE,
+            BIOMASS_COLOR,
+            opacity
+        );
+
+        biomassShapes.push(biomassRectangle);
+    }
+
+    return biomassShapes;
 }
