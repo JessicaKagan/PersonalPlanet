@@ -22,6 +22,10 @@ export enum WorldControlsTools {
     None, Query, Draw
 }
 
+export enum GraphicsOverlays {
+    None, Lifeforms
+}
+
 export enum TileInformationDialogMode {
     HOVER,
     DETAILED
@@ -32,8 +36,9 @@ export enum CustomPhaserEvents {
     CurrentSceneReady = 'CurrentSceneReady',
     CurrentWorldControlToolSelected = 'CurrentWorldControlToolSelected',
     CursorPositionInViewPort = 'CurrentPositionInViewPort',
-    TileSelected = 'TileSelected',
-    SimulationUpdated = 'SimulationUpdated'
+    OverlaySelected = 'OverlaySelected',
+    SimulationUpdated = 'SimulationUpdated',
+    TileSelected = 'TileSelected'
 }
 
 /** FUTURE: This interface will be expanded as we add more to the simulation that we'd like to show using the query tool.

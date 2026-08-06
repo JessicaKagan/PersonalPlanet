@@ -1,6 +1,6 @@
 <script lang="ts">
     import RootMenu from "../root_menu.svelte";
-    import { WorldControlsTools } from "../../../game/defines/core_defines";
+    import { GraphicsOverlays, WorldControlsTools } from "../../../game/defines/core_defines";
 
     import type { TPhaserRef } from "../../../PhaserGame.svelte";
     import type { Game } from "../../../game/scenes/Game";
@@ -26,6 +26,17 @@
         
     }
 
+    const selectOverlay = (overlay: GraphicsOverlays): void => {
+        // FUTURE: This "typecast to the relevant scene type" pattern was taken from the Phaser Svelte template.
+        // Is this a clean and safe way to get the information we need passed in? If not, we'll want to update it at some point.
+        const scene = phaserRef.scene as Game;
+
+        if (scene) {
+            scene.currentOverlay = overlay;
+        }
+        
+    }
+
 </script>
 
 <RootMenu class={propsClass}>
@@ -33,6 +44,10 @@
         These could either be images or SVGs. Potentially even a combination of the two. Material Symbols works well for the latter. -->
     <button class="controls" title="Query" aria-label="query" onclick={() => selectTool(WorldControlsTools.Query)}>🔍</button>
     <button class="controls" title="Draw" aria-label="draw" onclick={() => selectTool(WorldControlsTools.Draw)}>🖌️</button>
+
+    <!-- Overlay controls -->
+    <button class="controls" title="Disable All Overlays" aria-label="disable all overlays" onclick={() => selectOverlay(GraphicsOverlays.None)}>🪟</button>
+    <button class="controls" title="Show Life" aria-label="show life" onclick={() => selectOverlay(GraphicsOverlays.Lifeforms)}>🧬</button>
 </RootMenu>
 
 <style lang="scss">

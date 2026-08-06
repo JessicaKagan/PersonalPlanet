@@ -2,14 +2,15 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { World, DEFAULT_WORLD_SIZE } from '../world/World';
 import { type Tile } from '../world/Tile';
-import { DEFAULT_TILE_SIZE } from '../defines/core_defines';
 import { 
     DEFAULT_SIMULATION_TICKS_PER_SECOND,
     DEFAULT_ZOOM_TICK,
+    DEFAULT_TILE_SIZE,
     MINIMUM_ZOOM_FACTOR,
     MAXIMUM_ZOOM_FACTOR,
     WorldControlsTools,
     CustomPhaserEvents,
+    GraphicsOverlays,
     type QueryInfo,
     DEFAULT_SIMULATION_TICKS_PER_CLIMATE_UPDATE
 } from '../defines/core_defines';
@@ -54,6 +55,22 @@ export class Game extends Scene
         this._currentWorldControlTool = tool;
         EventBus.emit(CustomPhaserEvents.CurrentWorldControlToolSelected, this.currentWorldControlTool);
     }
+
+    private _currentOverlay = GraphicsOverlays.None;
+    public get currentOverlay(): GraphicsOverlays {
+        return this._currentOverlay;
+    }
+
+    /**
+     * @warning As a general rule, when the user changes their overlay (or a function changes it programatically),
+     * components should interact with that by consuming the OverlaySelected event, instead of directly following up.
+     * This helps keep functions simple and helps separate concerns.
+     */
+    public set currentOverlay(overlay: GraphicsOverlays) {
+        this._currentOverlay = overlay;
+        EventBus.emit(CustomPhaserEvents.OverlaySelected, this._currentOverlay);
+    }
+
 
     public currentQueryInfo: QueryInfo = {};
 
