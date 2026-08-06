@@ -92,13 +92,11 @@
 <style lang="scss">
     :global {
         .menu-container {
-            // TODO: Figure out why the height isn't scaling based on the viewport size.
-            // Once this is figured out, we can most likely remove the "top" rule.
-            height: 80%;
-            margin: 0 auto;
+            // FUTURE: We may want to revisit the height of this toolbar when we have more tools and overlays.
+            height: -webkit-fill-available;
+            margin: 64px auto;
             overflow-y: scroll;
             position: absolute;
-            top: 64px;
 
             // The menu is intended to be responsive... to a point.
             // A minimum width keeps the container from getting too small in the short term.
