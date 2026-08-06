@@ -76,6 +76,15 @@ export class Game extends Scene
     public set currentOverlay(overlay: GraphicsOverlays) {
         this._currentOverlay = overlay;
         EventBus.emit(CustomPhaserEvents.OverlaySelected, this._currentOverlay);
+
+        // When the user stops viewing overlays, clean everything out.
+        if (this._currentOverlay === GraphicsOverlays.None) {
+            this.overlayMap = {
+                shapes: [],
+                sprites: [],
+                tileSprites: []
+            };
+        }
     }
 
 
@@ -268,12 +277,19 @@ export class Game extends Scene
         this.timeSinceLastSceneUpdate = delta;
     }
 
+    /** Use the current state of the simulation to generate relevant overlay graphics objects for Phaser to render whenever the game scene updates.
+     * @warning For performance reasons, you should only call this method in response to relevant updateSimulation() calls.
+     * FUTURE: Investigate how we can this method (or at least as much of it as reasonably possible) to RenderingService.
+     */
+    private updateOverlayMap(overlayType: GraphicsOverlays): void {
+
+    }
+
     // TODO: Figure out if this and updateTileVisual should be moved to an "Update" file. Perhaps its own folder, too?
     /** Run simulation update tasks at preset intervals.
      * @returns A numeric ID for tracking the recursive timeout loop used to run simulation ticks.
      */
-    private updateSimulation(): number
-    {
+    private updateSimulation(): number {
         // We use a recursive timeout for to make sure every simulation tick is complete before moving onto the next, in case of slowdown.
         // setInterval allows us to set a maximum speed, but doesn't properly account for this.
         return setTimeout(() => {
@@ -284,6 +300,12 @@ export class Game extends Scene
                 this.world.updateClimate();
                 this.world.updateAllTiles(tile => this.world.updateTileTerrain(tile));
                 this.world.updateAllTiles(tile => this.world.updateTileAlbedo(tile));
+            }
+
+            if (this.simulationTicksElapsed % DEFAULT_SIMULATION_TICKS_PER_LIFE_UPDATE === 0) {
+                if (this.currentOverlay === GraphicsOverlays.Lifeforms) {
+                    this.updateOverlayMap(GraphicsOverlays.Lifeforms);
+                }
             }
 
             // FUTURE: This could be computationally expensive.
@@ -303,8 +325,7 @@ export class Game extends Scene
         }, this.updateInterval);
     }
 
-    changeScene ()
-    {
+    changeScene (): void {
         this.scene.start('MainMenu');
     }
 }
