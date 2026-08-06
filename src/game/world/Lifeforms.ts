@@ -1,3 +1,5 @@
+import type { LifeformsInTile } from "./Tile";
+
 /** Represents a type of living being that can appear in a player's World. */
 export interface Lifeform {
     // FUTURE: When we start showing Lifeform information to players in the UI,
@@ -20,8 +22,8 @@ export interface Lifeform {
 }
 
 /** General size categories for Lifeforms. These are intentionally left vague.
- * As of 07/29/2026, these will be used primarily for estimating the carrying capacity of a Tile.
- */
+* As of 07/29/2026, these will be used primarily for estimating the carrying capacity of a Tile.
+*/
 export enum LifeFormSize {
     /** Invisible to the naked eye. Bacteria, algae, plankton. */
     Microscopic,
@@ -37,6 +39,9 @@ export enum LifeFormSize {
     Huge
 }
 
+/** Adjust how many of a specific lifeform are generated based on their size.
+ * This method mirrors getSizeMultiplierForBiomass().
+ */
 export function getSizeMultiplierForInitialLifeformCount(size: LifeFormSize) {
     switch (size) {
         case LifeFormSize.Microscopic:
@@ -52,4 +57,35 @@ export function getSizeMultiplierForInitialLifeformCount(size: LifeFormSize) {
         case LifeFormSize.Huge:
             return 1;
     }
+}
+
+/** When calculating the overall biomass of a tile (for PP-5-2), ensure that larger lifeforms count for substantially more.
+ * This method getSizeMultiplierForInitialLifeformCount().
+ */
+export function getSizeMultiplierForBiomass(size: LifeFormSize) {
+    switch (size) {
+        case LifeFormSize.Microscopic:
+            return 1;
+        case LifeFormSize.Tiny:
+            return 4;
+        case LifeFormSize.Small:
+            return 16;
+        case LifeFormSize.Medium:
+            return Math.pow(2, 6); // 64
+        case LifeFormSize.Large:
+            return Math.pow(2, 12); // 4,096
+        case LifeFormSize.Huge:
+            return Math.pow(2, 20); // 1,048,576
+    }
+}
+
+/** Compute the overall biomass of a tile's lifeforms, as a weighted sum. */
+export function getBiomassForTile(lifeForms: LifeformsInTile[]): number {
+    if (lifeForms.length > 0) {
+        return lifeForms
+            .map(lifeForm => lifeForm.count * getSizeMultiplierForBiomass(lifeForm.type.size))
+            .reduce((previousValue, currentValue) => previousValue + currentValue);
+    }
+
+    return 0;
 }

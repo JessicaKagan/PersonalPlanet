@@ -7,7 +7,7 @@ import { isTileAquatic, type Tile } from './Tile';
 import { createNoise2D } from 'simplex-noise';
 import { SAFE_AVERAGE_TEMPERATURE, WATER_FREEZING_TEMPERATURE } from '../defines/core_defines';
 import { DEFAULT_LIFEFORMS } from '../defines/lifeforms';
-import { getSizeMultiplierForInitialLifeformCount } from './Lifeforms';
+import { getBiomassForTile, getSizeMultiplierForInitialLifeformCount } from './Lifeforms';
 
 import * as MathService from '../services/math';
 import * as UtilitiesService from '../services/utilities';
@@ -85,7 +85,8 @@ export class World {
                     albedo: 0,
                     humidity: 0,
                     elevation: 0,
-                    life: []
+                    life: [],
+                    biomass: 0
                 };
             }
         }
@@ -289,6 +290,9 @@ export class World {
                 });
             }
         });
+
+        /** After populating the lifeforms, record the tile's biomass. */
+        tile.biomass = getBiomassForTile(tile.life);
 
         return tile;
     }

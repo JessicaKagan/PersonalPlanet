@@ -49,6 +49,8 @@ export interface Tile {
     elevation: number;
     /** The lifeforms present in a tile. */
     life: LifeformsInTile[];
+    /** The amount of life in a tile, used for the life overlay. */
+    biomass: number;
 }
 
 /** A shorthand function for determining whether a tile represents a water biome.
