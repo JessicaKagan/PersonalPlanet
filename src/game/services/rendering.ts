@@ -2,6 +2,15 @@
 import { TerrainType } from '../world/TerrainType';
 import type { World } from '../world/World';
 
+/** Each overlay in Personal Planet potentially requires us to track a variety of graphical elements.
+ * The OverlayMap allows us to bundle together and update any relevant overlay graphics in one pass.
+ */
+export interface OverlayMap {
+    shapes: Phaser.GameObjects.Shape[];
+    sprites: Phaser.GameObjects.Sprite[];
+    tileSprites: Phaser.GameObjects.TileSprite[];
+}
+
 /** Update the visual representation of a tile in the world.
  * As of PP-4-2, this currently only updates tile textures.
  * @param tileSprite A Phaser tileSprite, which crucially contains the custom data we added in renderInitialWorld().

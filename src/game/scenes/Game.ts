@@ -25,6 +25,13 @@ export class Game extends Scene
     /** The representation of each World tile in the renderer. */
     tileSpriteMap: Phaser.GameObjects.TileSprite[] = [];
 
+    /** The representation of each Phaser game object required for the user's overlay in the renderer. */
+    overlayMap: RenderingService.OverlayMap = {
+        shapes: [],
+        sprites: [],
+        tileSprites: []
+    };
+
     public updateInterval = 1000 / DEFAULT_SIMULATION_TICKS_PER_SECOND; // Update the simulation every 20ms by default.
 
     // Keep track of times and deltas for Phaser scene and simulation updates.
