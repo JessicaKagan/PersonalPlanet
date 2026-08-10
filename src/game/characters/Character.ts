@@ -24,7 +24,7 @@ export class Character {
 
     public name: string;
     public species: Lifeform;
-    public spriteKey: string;
+    public spriteKey: string; // TODO: Update the Lifeform interface to have this property too, and use it when constructing characters based off lifeforms?
     public isProtected: boolean;
 
     public x?: number;

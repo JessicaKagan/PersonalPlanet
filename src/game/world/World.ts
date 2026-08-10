@@ -11,6 +11,7 @@ import { getBiomassForTile, getSizeMultiplierForInitialLifeformCount } from './L
 
 import * as MathService from '../services/math';
 import * as UtilitiesService from '../services/utilities';
+import type { Character } from '../characters/Character';
 
 export const DEFAULT_WORLD_SIZE = { x: 128, y: 64 };
 /** 1.361 kilowatts per square meter */
@@ -49,8 +50,13 @@ export class World {
     /** How quickly the world rotates. This is an arbitrary percentage. */
     public readonly rotationSpeed: number;
     
-    /** The 2D array of tiles that make up the world */
+    /** The 2D array of tiles that make up the world. */
     private tiles: Tile[][];
+
+    /** The simulation-level of each character in the user's world.
+     * @note These aren't strictly tied to specific tiles, unlike lifeforms/biomass in aggregate.
+     */
+    characters: Character[] = [];
 
     /**
      * Create a new, empty World object.
@@ -147,7 +153,8 @@ export class World {
     }
 
     /**
-     * Fill a World object with tiles. The methods here are loosely pulled from https://www.redblobgames.com/maps/terrain-from-noise/.
+     * Fill the player's world with initial tiles, lifeforms, characters, etc.
+     * The terrain generation methods here are loosely pulled from https://www.redblobgames.com/maps/terrain-from-noise/.
      * FUTURE: Add an argument for which mode we'll use to populate the world. The current one will be a "generate new world" method.
      * We'll also want to add a "load from save" method.
      */
@@ -166,6 +173,9 @@ export class World {
 
         // From there, seed the world with its initial lifeforms.
         this.updateAllTiles(tile => this.populateInitialTileLife(tile));
+
+        // Then, generate an initial selection of characters for the world.
+        this.populateInitialCharacters();
     }
     
     /** Generate an initial height for each tile.
@@ -295,6 +305,25 @@ export class World {
         tile.biomass = getBiomassForTile(tile.life);
 
         return tile;
+    }
+
+    /** Generate a selection of characters living in the World. */
+    private populateInitialCharacters(): void {
+        /** To generate the initial character list, we need to do the following (TODO: Move what makes sense here into a new tech spec!):
+         * 1. Determine what kinds of beings are eligible for being characters. This is most likely a task of extending the Lifeform interface.
+         * Later on, most characters will be sentient beings, but for now, any lifeform above small size should be eligible to be a character,
+         * with a bias towards larger lifeforms.
+         * 2. Run a loop to generate characters.
+         * For this, we need a "create valid character" method (probably in src\game\characters\Character.ts) that we iterate through until
+         * the length of this.characters == INITIAL_CHARACTER_COUNT_FOR_WORLDGEN.
+         * First, we select a tile and eligible species for character generation. The tile should be random and probably shouldn't have a character already in it.
+         * Then we choose something from the lifeforms present in that tile and create a Character object using these properties.
+         * Note - use weighted randomization for species choice! Each species should have a "weight" that's for now based on size. To get a weighted random number,
+         * sum up all the weights (example: 5 + 10 + 20 + 40 = 65) and generate a random number (Math.random * 65), then choose based on where we are in that band.
+         * Probably something like https://stackoverflow.com/questions/43566019/how-to-choose-a-weighted-random-array-element-in-javascript.
+         */ 
+
+        this.characters = []; // Not implemented yet.
     }
 
     /** Update the overall climate of the world on a per tile basis.

@@ -9,6 +9,7 @@ export const DEFAULT_TILE_SIZE = 64;
 export const DEFAULT_SIMULATION_TICKS_PER_SECOND = 50;
 export const DEFAULT_SIMULATION_TICKS_PER_CLIMATE_UPDATE = 500;
 export const DEFAULT_SIMULATION_TICKS_PER_LIFE_UPDATE = 100;
+export const DEFAULT_SIMULATION_TICKS_PER_CHARACTERS_UPDATE = 10;
 
 export const MINIMUM_ZOOM_FACTOR = 1;
 export const MAXIMUM_ZOOM_FACTOR = 1 / 16;
@@ -17,6 +18,9 @@ export const DEFAULT_ZOOM_TICK = Math.sqrt(2); // Using a number that "cleanly" 
 export const WATER_FREEZING_TEMPERATURE = 273;
 export const WATER_BOILING_TEMPERATURE = 373;
 export const SAFE_AVERAGE_TEMPERATURE = 288;
+
+export const INITIAL_CHARACTER_COUNT_FOR_WORLDGEN = 100;
+export const MAXIMUM_WORLD_CHARACTER_COUNT = 1000;
 
 /** These enums are used by components in the UX layer. */
 export enum WorldControlsTools {
