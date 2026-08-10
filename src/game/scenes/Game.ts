@@ -12,7 +12,8 @@ import {
     CustomPhaserEvents,
     GraphicsOverlays,
     type QueryInfo,
-    DEFAULT_SIMULATION_TICKS_PER_CLIMATE_UPDATE
+    DEFAULT_SIMULATION_TICKS_PER_CLIMATE_UPDATE,
+    DEFAULT_SIMULATION_TICKS_PER_LIFE_UPDATE
 } from '../defines/core_defines';
 
 import * as RenderingService from '../services/rendering';
@@ -27,7 +28,7 @@ export class Game extends Scene
 
     /** The representation of each Phaser game object required for the user's overlay in the renderer. */
     overlayMap: RenderingService.OverlayMap = {
-        shapes: [],
+        images: [],
         sprites: [],
         tileSprites: []
     };

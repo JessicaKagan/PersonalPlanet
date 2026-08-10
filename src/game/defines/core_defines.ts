@@ -7,7 +7,8 @@ import type { Tile } from "../world/Tile";
 export const DEFAULT_TILE_SIZE = 64;
 
 export const DEFAULT_SIMULATION_TICKS_PER_SECOND = 50;
-export const DEFAULT_SIMULATION_TICKS_PER_CLIMATE_UPDATE = 50; // TODO: We might want to make this significantly larger in the future!
+export const DEFAULT_SIMULATION_TICKS_PER_CLIMATE_UPDATE = 500;
+export const DEFAULT_SIMULATION_TICKS_PER_LIFE_UPDATE = 100;
 
 export const MINIMUM_ZOOM_FACTOR = 1;
 export const MAXIMUM_ZOOM_FACTOR = 1 / 16;
