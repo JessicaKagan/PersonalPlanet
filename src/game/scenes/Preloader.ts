@@ -156,6 +156,12 @@ export class Preloader extends Scene
             // { key: 'algae green', url: 'tiles/woodpath2.png' },
             // { key: 'algae green', url: 'tiles/yellow grass.png' },
         ])
+
+        // Static images for overlays
+        this.load.image([
+            { key: 'biomass overlay', url: '/overlays/biomass overlay.png' }
+        ]);
+
     }
 
     create ()

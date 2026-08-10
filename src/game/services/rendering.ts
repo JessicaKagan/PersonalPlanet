@@ -3,13 +3,13 @@ import type { Scene } from 'phaser';
 import { DEFAULT_TILE_SIZE, GraphicsOverlays } from '../defines/core_defines';
 import { TerrainType } from '../world/TerrainType';
 import type { World } from '../world/World';
-import { BIOMASS_COLOR } from '../defines/rendering_defines';
+import { OverlayImageKey } from '../defines/rendering_defines';
 
 /** Each overlay in Personal Planet potentially requires us to track a variety of graphical elements.
  * The OverlayMap allows us to bundle together and update any relevant overlay graphics in one pass.
  */
 export interface OverlayMap {
-    shapes: Phaser.GameObjects.Shape[];
+    images: Phaser.GameObjects.Image[];
     sprites: Phaser.GameObjects.Sprite[];
     tileSprites: Phaser.GameObjects.TileSprite[];
 }
@@ -26,12 +26,12 @@ export function updateOverlayMap(overlayMap: OverlayMap, overlayType: GraphicsOv
     // FUTURE: Simple shapes should be cleaned up and regenerated whenever we update the overlay map.
     // On the other hand, we may want to deactivate (setActive((false)) more complex objects and make them invisible,
     // in case we still want to keep track of them. This will require further research and planning.
-    overlayMap.shapes.forEach(shape => shape.destroy());
-    overlayMap.shapes = [];
+    overlayMap.images.forEach(shape => shape.destroy());
+    overlayMap.images = [];
 
     switch (overlayType) {
         case GraphicsOverlays.Lifeforms:
-            overlayMap.shapes = getShapesForLifeformsLayer(world, scene);
+            overlayMap.images = getImagesForLifeformsLayer(world, scene);
         case GraphicsOverlays.None:
         default:
             break;
@@ -92,30 +92,30 @@ export function getTileTextureKey(terrainType: TerrainType): string {
     }
 }
 
-/** Generate the shapes for the lifeforms overlay - a translucent green square for any tile that has life in it.
+/** Add static images for the lifeforms overlay - a translucent green square for any tile that has life in it.
  */
-function getShapesForLifeformsLayer(world: World, scene: Scene): Phaser.GameObjects.Shape[] {
-    const biomassShapes: Phaser.GameObjects.Shape[] = [];
+function getImagesForLifeformsLayer(world: World, scene: Scene): Phaser.GameObjects.Image[] {
+    const biomassImages: Phaser.GameObjects.Image[] = [];
     const tiles = world.getTiles().flat().filter(tile => tile.biomass > 0);
 
     // The tile(s) with the highest biomass get the highest opacity (50%).
     const maximumBiomass = Math.max(...tiles.map(tile => tile.biomass));
 
-    /** TODO: It looks like there's a significant performance cost to generating a bunch of shapes.
-     * Using a prebaked "overlay" (really, just a green square) will perform significantly better, so let's update that ASAP. */
+    /** FUTURE: Images are less performance intensive than shape primitives, but there's still a delay when generating the lifeform layer.
+     * How can we improve on this? One option is to generate a single overlay image (pixel by pixel) and render that.
+     * In order to do so, we'll have to figure out how to use a generated image in Phaser, as opposed to the key to a prebaked image.
+     * The texture classes (CanvasTexture) in particular are worth a look.
+     */
     for(let tile of tiles) {
-        const opacity = (tile.biomass / maximumBiomass) * 0.5;
-        const biomassRectangle = scene.add.rectangle(
+        const biomassRectangle = scene.add.image(
             tile.x * DEFAULT_TILE_SIZE,
             tile.y * DEFAULT_TILE_SIZE,
-            DEFAULT_TILE_SIZE,
-            DEFAULT_TILE_SIZE,
-            BIOMASS_COLOR,
-            opacity
-        );
+            OverlayImageKey.BIOMASS
+        )
 
-        biomassShapes.push(biomassRectangle);
+        biomassRectangle.alpha = (tile.biomass / maximumBiomass) * 0.5;
+        biomassImages.push(biomassRectangle);
     }
 
-    return biomassShapes;
+    return biomassImages;
 }
