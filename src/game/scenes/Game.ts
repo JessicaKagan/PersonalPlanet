@@ -20,8 +20,10 @@ import * as RenderingService from '../services/rendering';
 
 export class Game extends Scene
 {
-    camera: Phaser.Cameras.Scene2D.Camera;
-    world: World;
+    // The camera and world are initialized in this scene's create() hook (as provided by Phaser),
+    // as opposed to the scene constructor.
+    camera!: Phaser.Cameras.Scene2D.Camera;
+    world!: World;
 
     /** The representation of each World tile in the renderer. */
     tileSpriteMap: Phaser.GameObjects.TileSprite[] = [];
@@ -90,6 +92,7 @@ export class Game extends Scene
 
         // Vite hotloads are helpful for UX work, but can mess with the simulation loop.
         // We should clear any existing updateSimulation instances in this case.
+        // FUTURE: We should update the scene to keep track of us running in devmode, and only add this logic as appropriate.
         const hotContext = (import.meta as any).hot;
         if (hotContext) {
             hotContext.on("vite:beforeUpdate", () => {
