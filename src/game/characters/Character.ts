@@ -24,7 +24,7 @@ export class Character {
 
     public name: string;
     public species: Lifeform;
-    public spriteKey: string; // TODO: Update the Lifeform interface to have this property too, and use it when constructing characters based off lifeforms?
+    public spriteKey: string; // FUTURE: Sentient characters may want to have alternative graphics options beyond their species' sprite.
     public isProtected: boolean;
 
     public x?: number;

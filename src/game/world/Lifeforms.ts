@@ -7,6 +7,12 @@ export interface Lifeform {
     // we could include the preferred plural form of a Lifeform's name.
     name: string;
     size: LifeFormSize;
+
+    /** 
+     * @warning As of 08/11/2026, lifeforms can have a default sprite, but only should if they're eligible to be Characters.
+     * Otherwise, this field should explicitly be null.
+     */
+    spriteKey: string | null;
     
     preferredTemperature: number;
     preferredHumidity: number;
@@ -113,8 +119,12 @@ export function getBiomassForTile(lifeForms: LifeformsInTile[]): number {
 
 /** Compute whether a type of Lifeform has the right combination of properties to be a Character in the player's WOrld. */
 export function isLifeformValidCharacter(lifeform: Lifeform): boolean {
-    // As of 08/11/2026, lifeforms only need to be Small or larger in order to be valid targets for Character generation, 
+    // As of 08/11/2026, lifeforms need to be Small or larger and have a spriteKey defined in order to be valid targets for Character generation, 
     // but this will change over time. 
+    if (!lifeform.spriteKey) {
+        return false;
+    }
+
     if (lifeform.size === LifeFormSize.Microscopic || lifeform.size === LifeFormSize.Tiny) {
         return false;
     } else {
