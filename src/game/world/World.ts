@@ -319,13 +319,10 @@ export class World {
         // or (to prevent infinite loops) we reach the maximum number of allowed attempts.
         // In both cases, we should iterate on this logic further by preventing character generation in tiles without valid targets.
         for (let i = 0; i <= INITIAL_CHARACTER_COUNT_FOR_WORLDGEN; ++i) {
-            // TODO: The logic in this loop should be functionalized.
-            const tile = {
-                x: Math.floor(Math.random() * this.width),
-                y: Math.floor(Math.random() * this.height),
-            }
+            const x =  Math.floor(Math.random() * this.width);
+            const y =  Math.floor(Math.random() * this.height);
 
-            const validLifeformsForTile = this.tiles[tile.x][tile.y].life.filter(lifeform => isLifeformValidCharacter(lifeform.type));
+            const validLifeformsForTile = this.tiles[x][y].life.filter(lifeform => isLifeformValidCharacter(lifeform.type));
 
             if (validLifeformsForTile.length == 0) {
                 continue;
@@ -339,7 +336,9 @@ export class World {
                 species: lifeFormForCharacter.type,
                 spriteKey: '', // FUTURE: We'll create a real value when we start rendering lifeforms.
                 timeCreated: Date.now(),
-                isProtected: false
+                isProtected: false,
+                x,
+                y
             });
 
             this.characters.push(character);
