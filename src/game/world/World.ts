@@ -1,17 +1,17 @@
 /**
  * Represents the game world, which is a multidimensional array of tiles.
  */
-import { matrix, mean } from 'mathjs';
+import { matrix, mean, pickRandom } from 'mathjs';
 import { TerrainType } from './TerrainType';
 import { isTileAquatic, type Tile } from './Tile';
 import { createNoise2D } from 'simplex-noise';
-import { SAFE_AVERAGE_TEMPERATURE, WATER_FREEZING_TEMPERATURE } from '../defines/core_defines';
+import { INITIAL_CHARACTER_COUNT_FOR_WORLDGEN, SAFE_AVERAGE_TEMPERATURE, WATER_FREEZING_TEMPERATURE } from '../defines/core_defines';
 import { DEFAULT_LIFEFORMS } from '../defines/lifeforms';
-import { getBiomassForTile, getSizeMultiplierForInitialLifeformCount } from './Lifeforms';
+import { getBiomassForTile, getLifeformSizeWeightForCharacter, getSizeMultiplierForInitialLifeformCount, isLifeformValidCharacter } from './Lifeforms';
 
 import * as MathService from '../services/math';
 import * as UtilitiesService from '../services/utilities';
-import type { Character } from '../characters/Character';
+import { Character } from '../characters/Character';
 
 export const DEFAULT_WORLD_SIZE = { x: 128, y: 64 };
 /** 1.361 kilowatts per square meter */
@@ -157,6 +157,8 @@ export class World {
      * The terrain generation methods here are loosely pulled from https://www.redblobgames.com/maps/terrain-from-noise/.
      * FUTURE: Add an argument for which mode we'll use to populate the world. The current one will be a "generate new world" method.
      * We'll also want to add a "load from save" method.
+     * FUTURE: When generating a new world, we may want to run some simulation ticks to further smooth out layers (most likely the lifeform layer)
+     * before showing results to the player.
      */
     public populateWorld(): void {
         // Tile data is derived from a mixture of randomized sources (noise) and formulas running on these values.
@@ -307,23 +309,41 @@ export class World {
         return tile;
     }
 
-    /** Generate a selection of characters living in the World. */
+    /** Generate a selection of characters living in the World.
+     * @note We currently only attempt to generate characters in tiles that already have life present, which may change in the future.
+     */
     private populateInitialCharacters(): void {
-        /** To generate the initial character list, we need to do the following (TODO: Move what makes sense here into a new tech spec!):
-         * 1. Determine what kinds of beings are eligible for being characters. This is most likely a task of extending the Lifeform interface.
-         * Later on, most characters will be sentient beings, but for now, any lifeform above small size should be eligible to be a character,
-         * with a bias towards larger lifeforms.
-         * 2. Run a loop to generate characters.
-         * For this, we need a "create valid character" method (probably in src\game\characters\Character.ts) that we iterate through until
-         * the length of this.characters == INITIAL_CHARACTER_COUNT_FOR_WORLDGEN.
-         * First, we select a tile and eligible species for character generation. The tile should be random and probably shouldn't have a character already in it.
-         * Then we choose something from the lifeforms present in that tile and create a Character object using these properties.
-         * Note - use weighted randomization for species choice! Each species should have a "weight" that's for now based on size. To get a weighted random number,
-         * sum up all the weights (example: 5 + 10 + 20 + 40 = 65) and generate a random number (Math.random * 65), then choose based on where we are in that band.
-         * Probably something like https://stackoverflow.com/questions/43566019/how-to-choose-a-weighted-random-array-element-in-javascript.
-         */ 
+        // FUTURE: It's currently possible for a round of character generation to whiff if, for instance, we choose a tile that has no lifeforms.
+        // We should decide if we'd rather make X attempts at creating characters early on and accept a potentially lower creature count,
+        // or if we should attempt to continue character generation using a do-while loop until we reach either our target character count,
+        // or (to prevent infinite loops) we reach the maximum number of allowed attempts.
+        // In both cases, we should iterate on this logic further by preventing character generation in tiles without valid targets.
+        for (let i = 0; i <= INITIAL_CHARACTER_COUNT_FOR_WORLDGEN; ++i) {
+            // TODO: The logic in this loop should be functionalized.
+            const tile = {
+                x: Math.floor(Math.random() * this.width),
+                y: Math.floor(Math.random() * this.height),
+            }
 
-        this.characters = []; // Not implemented yet.
+            const validLifeformsForTile = this.tiles[tile.x][tile.y].life.filter(lifeform => isLifeformValidCharacter(lifeform.type));
+
+            if (validLifeformsForTile.length == 0) {
+                continue;
+            }
+
+            const weightsForLifeformSize = validLifeformsForTile.map(lifeform => getLifeformSizeWeightForCharacter(lifeform.type.size));
+            const lifeFormForCharacter = pickRandom(validLifeformsForTile, 1, weightsForLifeformSize)[0];
+            
+            const character = new Character({
+                name: `Character ${i}`, // FUTURE: We'll come up with a greater variety of names. We just need something for testing.
+                species: lifeFormForCharacter.type,
+                spriteKey: '', // FUTURE: We'll create a real value when we start rendering lifeforms.
+                timeCreated: Date.now(),
+                isProtected: false
+            });
+
+            this.characters.push(character);
+        }        
     }
 
     /** Update the overall climate of the world on a per tile basis.

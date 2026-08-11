@@ -39,6 +39,27 @@ export enum LifeFormSize {
     Huge
 }
 
+/** Adjust the frequency with which a Lifeform is used as the base for a randomly generated Character.
+ * As of 08/11/2026, most characters should be medium or large, with a few small or huge outliers.
+ */
+export function getLifeformSizeWeightForCharacter(size: LifeFormSize) {
+    switch (size) {
+        case LifeFormSize.Microscopic:
+            return 0;
+        case LifeFormSize.Tiny:
+            return 0;
+        case LifeFormSize.Small:
+            return 1;
+        case LifeFormSize.Medium:
+            return 32;
+        case LifeFormSize.Large:
+            return 64;
+        case LifeFormSize.Huge:
+            return 8;
+    }
+}
+
+
 /** Adjust how many of a specific lifeform are generated based on their size.
  * This method mirrors getSizeMultiplierForBiomass().
  */
