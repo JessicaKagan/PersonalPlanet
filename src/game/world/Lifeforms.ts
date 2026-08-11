@@ -89,3 +89,14 @@ export function getBiomassForTile(lifeForms: LifeformsInTile[]): number {
 
     return 0;
 }
+
+/** Compute whether a type of Lifeform has the right combination of properties to be a Character in the player's WOrld. */
+export function isLifeformValidCharacter(lifeform: Lifeform): boolean {
+    // As of 08/11/2026, lifeforms only need to be Small or larger in order to be valid targets for Character generation, 
+    // but this will change over time. 
+    if (lifeform.size === LifeFormSize.Microscopic || lifeform.size === LifeFormSize.Tiny) {
+        return false;
+    } else {
+        return true;
+    }
+}
