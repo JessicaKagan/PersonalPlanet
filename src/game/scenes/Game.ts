@@ -35,6 +35,9 @@ export class Game extends Scene
         tileSprites: []
     };
 
+    /** The representation of each of the world's Characters in the renderer. */
+    characters: Phaser.GameObjects.Sprite[] = [];
+
     public updateInterval = 1000 / DEFAULT_SIMULATION_TICKS_PER_SECOND; // Update the simulation every 20ms by default.
 
     // Keep track of times and deltas for Phaser scene and simulation updates.
@@ -110,6 +113,7 @@ export class Game extends Scene
         this.world = new World(DEFAULT_WORLD_SIZE.x, DEFAULT_WORLD_SIZE.y);
         this.world.populateWorld();
         this.renderInitialWorld();
+        this.characters = RenderingService.updateCharacterSprites(this.characters, this.world.characters, this.scene.scene);
 
         // Then, set up the Game scene's controls.
         this.addCamera();

@@ -4,6 +4,7 @@ import { DEFAULT_TILE_SIZE, GraphicsOverlays } from '../defines/core_defines';
 import { TerrainType } from '../world/TerrainType';
 import type { World } from '../world/World';
 import { OverlayImageKey } from '../defines/rendering_defines';
+import type { Character } from '../characters/Character';
 
 /** Each overlay in Personal Planet potentially requires us to track a variety of graphical elements.
  * The OverlayMap allows us to bundle together and update any relevant overlay graphics in one pass.
@@ -52,6 +53,34 @@ export function updateTileVisual(world: World, tileSprite: Phaser.GameObjects.Ti
 
     // The tileSprite is passed by reference, so we can update the contents of tileSpriteMap without having to mess with array indices et al.
     tileSprite.setTexture(getTileTextureKey(tile.terrainType));
+}
+
+/** Update the visual representation of character sprites in the world. */
+export function updateCharacterSprites(previousSprites: Phaser.GameObjects.Sprite[], characters: Character[], scene: Scene): Phaser.GameObjects.Sprite[] {
+    // TODO: How do we keep the sprites in sync with the simulation as the character list changes?
+
+    // TODO: To get started, we should create a sprite for each character in the world.
+    // We'll want to clean this up before we start simulating character behavior.
+    characters.forEach(character => {
+        if (character.x == undefined || character.y == undefined) {
+            return;
+        }
+
+        // FUTURE: Figure out some logic for how to render multiple characters sharing the same tile.
+        // We'll probably want to reduce the scale for more crowded tiles. We'll also want to set priorities.
+        // "Protected" characters, sentient characters, etc are more likely to be rendered in a tile. 
+        const characterSprite = scene.add.sprite(
+            character.x * DEFAULT_TILE_SIZE,
+            character.y * DEFAULT_TILE_SIZE,
+            character.spriteKey
+        )
+
+        characterSprite.scale = 2;
+
+        previousSprites.push(characterSprite);
+    })
+
+    return [];
 }
 
 /* Map terrain types to texture keys. */

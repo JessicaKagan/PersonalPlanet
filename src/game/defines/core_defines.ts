@@ -19,7 +19,7 @@ export const WATER_FREEZING_TEMPERATURE = 273;
 export const WATER_BOILING_TEMPERATURE = 373;
 export const SAFE_AVERAGE_TEMPERATURE = 288;
 
-export const INITIAL_CHARACTER_COUNT_FOR_WORLDGEN = 100;
+export const INITIAL_CHARACTER_COUNT_FOR_WORLDGEN = 500;
 export const MAXIMUM_WORLD_CHARACTER_COUNT = 1000;
 
 /** These enums are used by components in the UX layer. */

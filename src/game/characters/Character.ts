@@ -19,7 +19,7 @@ interface CharacterConstructorArgs {
 }
 
 export class Character {
-    private readonly id: string;
+    public readonly id: string;
     public readonly timeCreated: number; // TODO: Should this be a simulation tick?
 
     public name: string;

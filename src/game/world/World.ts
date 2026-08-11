@@ -334,7 +334,7 @@ export class World {
             const character = new Character({
                 name: `Character ${i}`, // FUTURE: We'll come up with a greater variety of names. We just need something for testing.
                 species: lifeFormForCharacter.type,
-                spriteKey: '', // FUTURE: We'll create a real value when we start rendering lifeforms.
+                spriteKey: lifeFormForCharacter.type.spriteKey ?? '', // FUTURE: We may need more error trapping here.
                 timeCreated: Date.now(),
                 isProtected: false,
                 x,
