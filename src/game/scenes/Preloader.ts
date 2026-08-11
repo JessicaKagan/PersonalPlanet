@@ -162,6 +162,15 @@ export class Preloader extends Scene
             { key: 'biomass overlay', url: '/overlays/biomass overlay.png' }
         ]);
 
+        // Sprites for characters
+        this.load.image([
+            { key: 'goldfish', url: '/characters/giant_goldfish.png' },
+            { key: 'kraken', url: '/characters/kraken_head_new.png' },
+            { key: 'shark', url: '/characters/shark_new.png' },
+            { key: 'wolf', url: '/characters/wolf.png' },
+            { key: 'yak', url: '/characters/yak_new.png' }
+        ]);
+
     }
 
     create ()
